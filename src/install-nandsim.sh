@@ -5,13 +5,13 @@ case $1 in
 	formuler1)
 		SRC="https://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/nandsim/formuler1/kernel-module-nandsim.ipk"
 		DEST=/tmp/kernel-module-nandsim.ipk
-		if which curl >/dev/null 2>&1 ; then
-			curl -o $DEST $SRC
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
 		else
-			echo >&2 "install-nandsim: cannot find curl"
-			opkg update && opkg install curl
-			if which curl >/dev/null 2>&1 ; then
-				curl -o $DEST $SRC
+			echo >&2 "install-nandsim: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
 			fi
 		fi
 		if ! [ -f $DEST ] ; then
@@ -25,13 +25,13 @@ case $1 in
 	formuler3)
 		SRC="https://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/nandsim/formuler3/kernel-module-nandsim.ipk"
 		DEST=/tmp/kernel-module-nandsim.ipk
-		if which curl >/dev/null 2>&1 ; then
-			curl -o $DEST $SRC
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
 		else
-			echo >&2 "install-nandsim: cannot find curl"
-			opkg update && opkg install curl
-			if which curl >/dev/null 2>&1 ; then
-				curl -o $DEST $SRC
+			echo >&2 "install-nandsim: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
 			fi
 		fi
 		if ! [ -f $DEST ] ; then
@@ -45,13 +45,13 @@ case $1 in
 	formuler4)
 		SRC="https://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/nandsim/formuler4/kernel-module-nandsim.ipk"
 		DEST=/tmp/kernel-module-nandsim.ipk
-		if which curl >/dev/null 2>&1 ; then
-			curl -o $DEST $SRC
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
 		else
-			echo >&2 "install-nandsim: cannot find curl"
-			opkg update && opkg install curl
-			if which curl >/dev/null 2>&1 ; then
-				curl -o $DEST $SRC
+			echo >&2 "install-nandsim: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
 			fi
 		fi
 		if ! [ -f $DEST ] ; then
@@ -65,13 +65,13 @@ case $1 in
 	multiboot_formuler)
 		SRC="https://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/src/bin/mips/formuler/open_multiboot"
 		DEST=/tmp/open_multiboot
-		if which curl >/dev/null 2>&1 ; then
-			curl -o $DEST $SRC
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
 		else
-			echo >&2 "install-open_multiboot: cannot find curl"
-			opkg update && opkg install curl
-			if which curl >/dev/null 2>&1 ; then
-				curl -o $DEST $SRC
+			echo >&2 "install-open_multiboot: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
 			fi
 		fi
 		if ! [ -f $DEST ] ; then
@@ -92,21 +92,22 @@ case $1 in
 		exit 0
 	;;
 	dmm_nfidump)
-		SRC="https://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/src/bin/mips/dmm_nfidump/nfidump_1.0_all.ipk"
+		SRC="http://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/src/bin/mips/dmm_nfidump/nfidump_1.0_all.ipk"
 		DEST=/tmp/nfidump_1.0_all.ipk
-		if which curl >/dev/null 2>&1 ; then
-			curl -o $DEST $SRC
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
 		else
-			echo >&2 "install-nfidump: cannot find curl"
-			opkg update && opkg install curl
-			if which curl >/dev/null 2>&1 ; then
-				curl -o $DEST $SRC
+			echo >&2 "install-nfidump: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
 			fi
 		fi
 		if ! [ -f $DEST ] ; then
 			echo >&2 "install-nfidump: download failed"
 			exit 1
 		else
+			opkg remove nfidump
 			opkg install /tmp/nfidump_1.0_all.ipk
 		fi
 		exit 0
@@ -120,4 +121,3 @@ esac
 echo "Done..."
 
 exit 0
-

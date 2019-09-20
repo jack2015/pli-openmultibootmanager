@@ -52,33 +52,6 @@ try:
 except:
 	screenWidth = 720
 
-def ismultibootFile():
-	multiboot_bin = "/sbin/open_multiboot"
-	if not os.path.isfile(multiboot_bin):
-		arch = os.popen("uname -m").read()
-		if 'mips' in arch:
-			MIPS = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/bin/mips/open_multiboot"
-			if os.path.isfile(MIPS):
-				os.chmod(MIPS, 0755)
-				os.system("cp %s /sbin/open_multiboot" % MIPS)
-		elif 'armv7l' in arch:
-			ARMV71 = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/bin/armv7l/open_multiboot"
-			if os.path.isfile(ARMV71):
-				os.chmod(ARMV71, 0755)
-				os.system("cp %s /sbin/open_multiboot" % ARMV71)
-		elif 'sh4' in arch:
-			SH4 = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/bin/sh4/open_multiboot"
-			if os.path.isfile(SH4):
-				os.chmod(SH4, 0755)
-				os.system("cp %s /sbin/open_multiboot" % SH4)
-		if os.path.isfile(multiboot_bin):
-			return True
-	else:
-		return True
-	return False
-
-loadScript = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/install-nandsim.sh"
-
 class OMBManagerList(Screen):
 	if screenWidth >= 1920:
 		skin = """
@@ -161,13 +134,8 @@ class OMBManagerList(Screen):
 		})
 		self.setrcType()
 		self.checktimer = eTimer()
-		self.checktimer.callback.append(self.getMultiboot)
 		if self.checkflashImage():
 			self.checktimer.start(2000, True)
-
-	def getMultiboot(self):
-		if not ismultibootFile():
-			self.session.open(MessageBox,_("Warning!\n'/sbin/open_multiboot' not installed!"), MessageBox.TYPE_ERROR)
 
 	def guessImageTitle(self, base_path, identifier):
 		image_distro = ""
@@ -394,22 +362,66 @@ class OMBManagerList(Screen):
 					if self.isCompatible(base_path):
 						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
 
-	def isCompatible(self, base_path=''):
-		box_name = BOX_NAME
-		if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-			box_name = "vu" + BOX_NAME
-		if box_name == "et11000":
-			box_name = "et1"
-		if box_name == "lunix3-4k":
-			box_name = "lunix3"
+	def isCompatible(self, base_path):
+		running_box_type = "None"
+		e2_path = '/usr/lib/enigma2/python'
+		if os.path.exists(e2_path + '/boxbranding.so'):
+			helper = os.path.dirname("/usr/bin/python " + os.path.abspath(__file__)) + "/open-multiboot-branding-helper.py"
+			try:
+				fin,fout = os.popen4(helper + " " + e2_path + " box_type")
+			except:
+				fout = os.popen(helper + " " + e2_path + " box_type")				
+			running_box_type = fout.read().strip()
+
+		e2_path = base_path + '/usr/lib/enigma2/python'
+		if os.path.exists(e2_path + '/boxbranding.so'):
+			helper = os.path.dirname("/usr/bin/python " + os.path.abspath(__file__)) + "/open-multiboot-branding-helper.py"
+			try:
+				fin,fout = os.popen4(helper + " " + e2_path + " brand_oem")
+			except:
+				fout = os.popen(helper + " " + e2_path + " brand_oem")				
+			brand_oem = fout.read().strip()
+			try:
+				fin,fout = os.popen4(helper + " " + e2_path + " box_type")
+			except:
+				fout = os.popen(helper + " " + e2_path + " box_type")
+			box_type = fout.read().strip()
+
+			if brand_oem == "vuplus" and box_type[0:2] != "vu":
+				box_type = "vu" + box_type
+				print "OMB: buggy image, fixed box_type is %s" % box_type
+
+			if box_type == "et11000":
+				box_type = "et1"
+			if box_type == "lunix3-4k":
+				box_type = "lunix3"
+
+			if brand_oem == 'formuler':
+				if running_box_type != "formuler4turbo" or box_type != "formuler4turbo":
+					running_box_type = running_box_type[:9]
+					box_type = box_type[:9]
+
+			print "DEBUG",base_path, running_box_type , box_type
+			return (running_box_type == box_type)
+
 		try:
+			if running_box_type is None:
+				running_box_type = BOX_NAME
+				if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
+					running_box_type = "vu" + BOX_NAME
+			if running_box_type == "et11000":
+				running_box_type = "et1"
+			if running_box_type == "lunix3-4k":
+				running_box_type = "lunix3"
 			archconffile = "%s/etc/opkg/arch.conf" % base_path
 			with open(archconffile, "r") as arch:
 				for line in arch:
-					if box_name in line:
+					box_type = line.split()[1]
+					if running_box_type == box_type or running_box_type in line:
 						return True
 		except:
-			return False
+			pass
+
 		return False
 
 	def checkflashImage(self):

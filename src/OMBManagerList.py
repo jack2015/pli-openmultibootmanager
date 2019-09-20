@@ -493,8 +493,8 @@ class OMBManagerList(Screen):
 			if os.path.isfile('/sbin/open_multiboot'):
 				if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
 					menu.append((_("Enable '/sbin/open_multiboot'"), "enable"))
-				else:
-					menu.append((_("Disable '/sbin/open_multiboot'"), "disable"))
+#				else:
+#					menu.append((_("Disable '/sbin/open_multiboot'"), "disable"))
 			else:
 				menu.append((_("Install '/sbin/open_multiboot'"), "multiboot"))
 			if os.path.isfile(self.data_dir + '/.bootmenu.lock'):

@@ -76,6 +76,7 @@ class OMBManagerInit:
 			return
 
 		if os.path.isfile('/sbin/open_multiboot'):
+			os.system('rm /sbin/init')
 			os.system("ln -sfn /sbin/open_multiboot /sbin/init")
 
 		self.session.open(OMBManagerList, partition.mountpoint)
@@ -236,7 +237,8 @@ def OMBManager(session, **kwargs):
 				if os.path.exists(data_dir) and os.access(p.mountpoint, os.F_OK|os.R_OK) and isMounted(p.mountpoint):
 					if not os.path.ismount('/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot'):
 						if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
-							if os.path.isfile('open_multiboot'):
+							if os.path.isfile('/sbin/open_multiboot'):
+								os.system('rm /sbin/init')
 								os.system("ln -sfn /sbin/open_multiboot /sbin/init")
 					session.open(OMBManagerList, p.mountpoint)
 					found = True

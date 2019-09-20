@@ -75,9 +75,10 @@ class OMBManagerInit:
 			self.session.open(MessageBox, _("Cannot create data folder"), type = MessageBox.TYPE_ERROR)
 			return
 
-		if os.path.isfile('/sbin/open_multiboot'):
-			os.system('rm /sbin/init')
-			os.system("ln -sfn /sbin/open_multiboot /sbin/init")
+		if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
+			if os.path.isfile('/sbin/open_multiboot'):
+				os.system('rm /sbin/init')
+				os.system("ln -sfn /sbin/open_multiboot /sbin/init")
 
 		self.session.open(OMBManagerList, partition.mountpoint)
 

@@ -363,37 +363,39 @@ class OMBManagerList(Screen):
 						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
 
 	def isCompatible(self, base_path):
-		running_box_type = BOX_NAME
+		running = BOX_NAME
+		b_type = ""
 		if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-			running_box_type = "vu" + BOX_NAME
-		if running_box_type == "et11000":
-			running_box_type = "et1"
-		if running_box_type == "lunix3-4k":
-			running_box_type = "lunix3"
+			running = "vu" + BOX_NAME
+		if running == "et11000":
+			running = "et1"
+		if running == "lunix3-4k":
+			running = "lunix3"
 		archconffile = "%s/etc/hostname" % base_path
 		if os.path.exists(archconffile):
 			f = open(archconffile, "r")
 			try:
-				box_type = str(f.read().lower().replace('\n',''))
+				b_type = str(f.read().lower().replace('\n',''))
 			except:
 				pass
 			f.close()
-		if running_box_type == box_type or running_box_type in box_type:
+		if running == b_type or running in b_type:
 			return True
 		
 		try:
 			archconffile = "%s/etc/opkg/arch.conf" % base_path
-			with open(archconffile, "r") as arch:
-				for line in arch:
-					box_type = line.split()[1]
-					if running_box_type == box_type or running_box_type in line:
-						return True
+			if os.path.exists(archconffile):
+				with open(archconffile, "r") as arch:
+					for line in arch:
+						b_type = line.split()[1]
+						if running == b_type or running in line:
+							return True
 			archconffile = "%s/etc/image-version" % base_path
 			if os.path.exists(archconffile):
 				with open(archconffile, "r") as arch:
 					for line in arch:
-						box_type = line.split()[2]
-						if running_box_type == box_type or running_box_type in line:
+						b_type = line.split()[2]
+						if running == b_type or running in line:
 							return True
 		except:
 			pass

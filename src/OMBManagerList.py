@@ -63,15 +63,14 @@ class OMBManagerList(Screen):
 			<widget source="list" render="Listbox" position="10,160" itemHeight="35" font="Regular;33" zPosition="3" size="960,315" scrollbarMode="showOnDemand" transparent="1">
 				<convert type="StringList" />
 			</widget>
-			<widget name="key_red" position="0,550" size="230,35" zPosition="5" transparent="1" foregroundColor="white" font="Regular;28" />
-			<widget name="key_green" position="240,550" size="230,35" zPosition="5" transparent="1" foregroundColor="white" font="Regular;28" />
-			<widget name="key_yellow" position="500,550" size="230,35" zPosition="5" transparent="1" foregroundColor="white" font="Regular;28" />
-			<widget name="key_blue" position="750,550" size="230,35" zPosition="5" transparent="1" foregroundColor="white" font="Regular;28" />
-			<ePixmap name="red" pixmap="skin_default/buttons/red.png" position="0,540" size="250,60" zPosition="4" transparent="1" alphatest="on" />
-			<ePixmap name="green" pixmap="skin_default/buttons/green.png" position="250,540" size="250,60" zPosition="4" transparent="1" alphatest="on" />
-			<ePixmap name="yellow" pixmap="skin_default/buttons/yellow.png" position="500,540" size="250,60" zPosition="4" transparent="1" alphatest="on" />
-			<ePixmap name="blue" pixmap="skin_default/buttons/blue.png" position="750,540" size="250,60" zPosition="4" transparent="1" alphatest="on" />
-
+			<widget name="key_red" position="50,550" size="130,35" zPosition="5" halign="center" valign="center" transparent="1" foregroundColor="white" font="Regular;28" />
+			<widget name="key_green" position="300,550" size="130,35" zPosition="5" halign="center" valign="center" transparent="1" foregroundColor="white" font="Regular;28" />
+			<widget name="key_yellow" position="550,550" size="130,35" zPosition="5" halign="center" valign="center" transparent="1" foregroundColor="white" font="Regular;28" />
+			<widget name="key_blue" position="800,550" size="130,35" zPosition="5" halign="center" valign="center" transparent="1" foregroundColor="white" font="Regular;28" />
+			<ePixmap name="red" pixmap="skin_default/buttons/red.png" position="50,545" size="150,60" zPosition="4" transparent="1" alphatest="on" />
+			<ePixmap name="green" pixmap="skin_default/buttons/green.png" position="300,545" size="150,60" zPosition="4" transparent="1" alphatest="on" />
+			<ePixmap name="yellow" pixmap="skin_default/buttons/yellow.png" position="550,545" size="150,60" zPosition="4" transparent="1" alphatest="on" />
+			<ePixmap name="blue" pixmap="skin_default/buttons/blue.png" position="800,545" size="150,60" zPosition="4" transparent="1" alphatest="on" />
 			<ePixmap name="info" pixmap="skin_default/buttons/key_info.png" position="920,490" size="50,50" zPosition="4" transparent="1" alphatest="on" />
 			<widget name="key_ok" position="0,500" size="900,30" zPosition="5" transparent="1" foregroundColor="#00ffc000" font="Regular;27" />
 		</screen>"""

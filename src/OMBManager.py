@@ -75,10 +75,10 @@ class OMBManagerInit:
 			self.session.open(MessageBox, _("Cannot create data folder"), type = MessageBox.TYPE_ERROR)
 			return
 
-		if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
-			if os.path.isfile('/sbin/open_multiboot'):
-				os.system('rm /sbin/init')
-				os.system("ln -sfn /sbin/open_multiboot /sbin/init")
+#		if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
+#			if os.path.isfile('/sbin/open_multiboot'):
+#				os.system('rm /sbin/init')
+#				os.system("ln -sfn /sbin/open_multiboot /sbin/init")
 
 		self.session.open(OMBManagerList, partition.mountpoint)
 
@@ -236,11 +236,11 @@ def OMBManager(session, **kwargs):
 			if p and p.device and p.mountpoint != '/' and (p.device[:2] == 'sd' or (p.device.startswith('mmcblk0p') and BOX_NAME not in ('5008', 'et13000', 'et11000',' et1x000', 'uno4k', 'uno4kse', 'ultimo4k', 'solo4k', 'zero4k', 'hd51', 'hd52', 'dm820', 'dm7080', 'sf4008', 'dm900', 'dm920', 'gb7252', 'lunix3-4k', 'vs1500', 'h7', '8100s'))):
 				data_dir = p.mountpoint + '/' + OMB_DATA_DIR
 				if os.path.exists(data_dir) and os.access(p.mountpoint, os.F_OK|os.R_OK) and isMounted(p.mountpoint):
-					if not os.path.ismount('/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot'):
-						if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
-							if os.path.isfile('/sbin/open_multiboot'):
-								os.system('rm /sbin/init')
-								os.system("ln -sfn /sbin/open_multiboot /sbin/init")
+#					if not os.path.ismount('/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot'):
+#						if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
+#							if os.path.isfile('/sbin/open_multiboot'):
+#								os.system('rm /sbin/init')
+#								os.system("ln -sfn /sbin/open_multiboot /sbin/init")
 					session.open(OMBManagerList, p.mountpoint)
 					found = True
 					break

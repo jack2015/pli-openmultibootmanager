@@ -216,7 +216,7 @@ class OMBManagerList(Screen):
 			self["key_ok"].setText(_('Press OK to next boot.') + self.checkStatusOMB())
 			self["nextboot"].setText(_('Next boot: %s') % self.name)
 		else:
-			self["key_ok"].setText('')
+			self["key_ok"].setText(self.checkStatusOMB()+'Press MENU button to setup')
 			self["nextboot"].setText('')
 
 	def refresh(self):
@@ -510,9 +510,9 @@ class OMBManagerList(Screen):
 				menu.append((folder, "delete"))
 			if os.path.isfile('/sbin/open_multiboot'):
 				if os.readlink("/sbin/init") == "/sbin/init.sysvinit":
-					menu.append((_("Enable '/sbin/open_multiboot'"), "enable"))
+					menu.append((_("Enable OMB plug-in"), "enable"))
 				else:
-					menu.append((_("Disable '/sbin/open_multiboot'"), "disable"))
+					menu.append((_("Disable OMB plug-in"), "disable"))
 			else:
 				menu.append((_("Install '/sbin/open_multiboot'"), "multiboot"))
 			if os.path.isfile(self.data_dir + '/.bootmenu.lock'):

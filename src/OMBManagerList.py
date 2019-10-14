@@ -216,7 +216,7 @@ class OMBManagerList(Screen):
 			self["key_ok"].setText(_('Press OK to next boot.') + self.checkStatusOMB())
 			self["nextboot"].setText(_('Next boot: %s') % self.name)
 		else:
-			self["key_ok"].setText(self.checkStatusOMB()+'Press MENU button to setup')
+			self["key_ok"].setText(self.checkStatusOMB()+_("Press MENU button to setup"))
 			self["nextboot"].setText('')
 
 	def refresh(self):

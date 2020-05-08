@@ -92,7 +92,7 @@ case $1 in
 		exit 0
 	;;
 	dmm_nfidump)
-		SRC="https://raw.githubusercontent.com/Dima73/pli-openmultibootmanager/master/src/bin/mips/dmm_nfidump/nfidump_1.0_all.ipk"
+		SRC="http://download940.mediafire.com/hjlvmn8efneg/72xvxdqn6fsn31s/nfidump_1.0_all.ipk"
 		DEST=/tmp/nfidump_1.0_all.ipk
 		if which wget >/dev/null 2>&1 ; then
 			wget --no-check-certificate -O $DEST $SRC

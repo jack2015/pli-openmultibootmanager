@@ -92,7 +92,7 @@ case $1 in
 		exit 0
 	;;
 	dmm_nfidump)
-		SRC="http://download940.mediafire.com/hjlvmn8efneg/72xvxdqn6fsn31s/nfidump_1.0_all.ipk"
+		SRC="https://jack2015.github.io/files/nfidump_1.0_all.ipk"
 		DEST=/tmp/nfidump_1.0_all.ipk
 		if which wget >/dev/null 2>&1 ; then
 			wget --no-check-certificate -O $DEST $SRC

@@ -1,0 +1,303 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Sandro Cavazzoni <sandro@skanetwork.com>, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-11-15 17:16+0100\n"
+"PO-Revision-Date: 2021-10-30 05:49+0800\n"
+"Last-Translator: neoatomic <neoatomic@users.noreply.github.com>\n"
+"Language-Team: German <arn354@email.de>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.0.6\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid ""
+" to use openMultiboot\n"
+"Do you want install it?"
+msgstr ""
+" 为了使用OpenMultiboot\n"
+"要安装它吗?"
+
+msgid "(Folder is empty!) "
+msgstr "(目录是空的!) "
+
+msgid "(Unpack error!) "
+msgstr "(解压错误!) "
+
+msgid "About"
+msgstr "关于"
+
+msgid "Add zip archive with image in 'open-multiboot-upload'"
+msgstr "请在目录\"open-multiboot-upload\"内上传用zip打包的固件"
+
+msgid "Alternative name image folder"
+msgstr "手工输入固件在压缩档内所在目录"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Cannot create data folder"
+msgstr "无法创建数据文件夹"
+
+msgid "Cannot create folder %s"
+msgstr "无法创建文件夹 %s"
+
+msgid "Cannot create kernel folder %s"
+msgstr "无法创建内核文件夹 %s"
+
+msgid "Cannot create main folder %s"
+msgstr "无法创建主目录 %s"
+
+msgid "Cannot create virtual MTD device"
+msgstr "无法创建虚拟MTD设备"
+
+msgid "Cannot deflate image"
+msgstr "无法缩小图像"
+
+msgid "Cannot extract nfi image"
+msgstr "无法提取NFI图像"
+
+msgid "Cannot format the device"
+msgstr "无法格式化设备"
+
+msgid "Cannot install "
+msgstr "无法安装 "
+
+msgid "Cannot remount the device"
+msgstr "无法重新装载设备"
+
+msgid "Cannot umount the device"
+msgstr "无法卸载设备"
+
+msgid "Choose the image to install"
+msgstr "选择想要安装的固件"
+
+msgid "Current Running Image:"
+msgstr "目前运行的固件:"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Delete folder %s and all file"
+msgstr "删除整个目录 %s"
+
+msgid "Disable OMB plug-in"
+msgstr "禁用OMB多重引导插件"
+
+msgid "Disable autoscan zip archive at mount device"
+msgstr "禁用自动扫描ZIP压缩档"
+
+msgid "Disable boot menu"
+msgstr "禁用启动菜单"
+
+msgid "Do you really want add %s with image in 'open-multiboot-upload'?"
+msgstr "真的在\"open-multiboot-upload\"目录中添加 %s ?"
+
+msgid "Do you want to delete %s?"
+msgstr "要删除 %s 吗?"
+
+msgid "Do you want to reboot box now ?"
+msgstr "现在要重新启动吗?"
+
+msgid "Do you want to reboot now ?"
+msgstr "现在要重新启动吗?"
+
+msgid "Enable OMB plug-in"
+msgstr "启用OMB多重引导插件"
+
+msgid "Enable autoscan zip archive at mount device"
+msgstr "启用自动扫描ZIP压缩档"
+
+msgid "Enable boot menu"
+msgstr "启用启动菜单"
+
+msgid "Error adding zip archive!"
+msgstr "添加ZIP压缩档时发生错误！"
+
+msgid "Error copying kernel"
+msgstr "复制内核时出错"
+
+msgid "Error copying unpacked rootfs"
+msgstr "复制解压缩的rootfs时出错"
+
+msgid "Error removing zip archive!"
+msgstr "移动ZIP压缩档时发生错误！"
+
+msgid "Error set new timeout!"
+msgstr "设置新的 \"timeout\" 时发生错误！"
+
+msgid "Error unpacking rootfs"
+msgstr "解压缩rootfs时发生错误"
+
+msgid "Exit"
+msgstr "退出"
+
+msgid "Extra setup"
+msgstr "额外设置"
+
+msgid ""
+"Filesystem not supported\n"
+"Do you want format your drive?"
+msgstr ""
+"不支持文件系统\n"
+"要格式化驱动器吗?"
+
+msgid "Fix mount devices (for PLi)"
+msgstr "为Openpli进行装载设备补丁修复"
+
+msgid "Flash image"
+msgstr ""
+
+msgid ""
+"For this reciever need only first partition muliboot image for use "
+"'openMultiboot'!\n"
+"Current partition muliboot image - %s"
+msgstr ""
+
+msgid "Generic error in unpaack process"
+msgstr "解包过程中出现一般性错误"
+
+msgid "Incorrect time!"
+msgstr "时间不对！"
+
+msgid "Install"
+msgstr "安装"
+
+msgid "Install '/sbin/open_multiboot'"
+msgstr "安装open_multiboot模块"
+
+msgid "Install alternative '/sbin/open_multiboot'"
+msgstr ""
+
+msgid "Menu"
+msgstr "菜单"
+
+msgid "Multi boot loader for enigma2 box"
+msgstr "Enigma2多重引导"
+
+msgid "Next boot: %s"
+msgstr "下一次启动: %s"
+
+msgid "No suitable devices found"
+msgstr "找不到合适的设备"
+
+msgid "Not found boxbranding.so!"
+msgstr "未找到boxbranding.so!"
+
+msgid "OMB disabled."
+msgstr "OMB 已禁用。"
+
+msgid "OMB enabled."
+msgstr "OMB 已启用。"
+
+msgid "Open MultiBoot Menu"
+msgstr "OpenMultiboot 菜单"
+
+msgid "OpenMultiboot Manager"
+msgstr "OpenMultiboot 管理"
+
+msgid "Please enter new name:"
+msgstr "请输入新名字:"
+
+msgid "Please select the necessary option..."
+msgstr "请选择必要的选项…"
+
+msgid "Please upload an image inside %s"
+msgstr "请在 %s 内上传固件"
+
+msgid "Please wait 40 seconds, while delete is in progress."
+msgstr "正在进行删除，请等待40秒。"
+
+msgid "Please wait while delete is in progress."
+msgstr "正在进行删除，请稍候."
+
+msgid "Please wait while format is in progress."
+msgstr "正在进行格式化，请稍候."
+
+msgid "Please wait while installation is in progress."
+msgstr "正在进行安装，请稍候."
+
+msgid ""
+"Please wait while installation is in progress.\n"
+"This operation may take a while."
+msgstr ""
+"正在进行安装，请稍候.\n"
+"这个过程可能需要一段时间."
+
+msgid "Press OK to next boot."
+msgstr "按 OK 设置下一次启动。"
+
+msgid "Read error current dir, sorry."
+msgstr "读取当前目录发生错误。"
+
+msgid "Readme"
+msgstr "使用说明"
+
+msgid "Rename"
+msgstr "重命名"
+
+msgid "Set new timeout (sec)"
+msgstr "设置新的 \"timeout(秒)\""
+
+msgid "Set next boot to %s ?"
+msgstr "将下一次启动设置为 %s ?"
+
+msgid "Standard install"
+msgstr "标准安装"
+
+msgid "The folder %s already exist"
+msgstr "该目录 %s 已经存在"
+
+msgid "Timeout boot menu: next %d sec"
+msgstr "启动菜单超时: 下一次 %d 秒"
+
+msgid "Use altenative folder"
+msgstr "使用手工输入的固件所在压缩包目录"
+
+msgid ""
+"Warning!\n"
+"'/sbin/open_multiboot' not installed!"
+msgstr ""
+"警告!\n"
+"'/sbin/open_multiboot' 未安装!"
+
+msgid "Where do you want to install openMultiboot?"
+msgstr "您想在哪里安装OpenMultiboot?"
+
+msgid "You need the module "
+msgstr "你需要这个模块 "
+
+msgid ""
+"You want to install an alternative kernel-module-nandsim?\n"
+"Linux version may be different from the module!"
+msgstr ""
+"你想安装一个替代的 kernel-module-nandsim 吗？\n"
+"Linux 版本可能与模块不同!"
+
+msgid "Your STB doesn't seem supported"
+msgstr "你的机顶盒好像不支持"
+
+msgid "openMultiboot About"
+msgstr "OpenMultiboot 关于"
+
+msgid "openMultiboot Install"
+msgstr "OpenMultiboot 安装"
+
+msgid "openMultiboot Manager"
+msgstr "OpenMultiboot 管理"
+
+msgid "zip archive was successfully added to '%s' OMB!"
+msgstr "zip 存档已成功添加到“%s”OMB!"
+
+msgid "Press MENU button to setup"
+msgstr "MENU键进行设置"

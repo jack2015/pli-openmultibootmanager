@@ -458,9 +458,9 @@ class OMBManagerInstall(Screen):
 			if BOX_MODEL != "dreambox":
 				self.showError(_("Your STB doesn\'t seem supported"))
 				return
-			if BOX_NAME == "dm800" or BOX_NAME == "dm500hd" or BOX_NAME == "dm800se" or BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or "dm500hdv2" or BOX_NAME == "dm800sev2":
+			if BOX_NAME in ("dm800", "dm500hd", "dm800se", "dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
 				if os.path.exists(OMB_NFIDUMP_BIN): # When use nfidump
-					if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
+					if BOX_NAME in ("dm800", "dm500hd", "dm800se"):
 						os.system(OMB_NFIDUMP_BIN + ' --squashfskeep ' + nfifile[0] + ' ' + target_folder)
 					else:
 						os.system(OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder)

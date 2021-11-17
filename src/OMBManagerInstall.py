@@ -460,7 +460,10 @@ class OMBManagerInstall(Screen):
 				return
 			if BOX_NAME == "dm800" or BOX_NAME == "dm500hd" or BOX_NAME == "dm800se" or BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or "dm500hdv2" or BOX_NAME == "dm800sev2":
 				if os.path.exists(OMB_NFIDUMP_BIN): # When use nfidump
-					os.system(OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder)
+					if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
+						os.system(OMB_NFIDUMP_BIN + ' --squashfskeep ' + nfifile[0] + ' ' + target_folder)
+					else:
+						os.system(OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder)
 					if not os.path.exists(target_folder + "/usr/bin/enigma2"):
 						self.showError(_("Cannot extract nfi image"))
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)

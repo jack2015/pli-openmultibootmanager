@@ -39,6 +39,7 @@ from OMBManagerInstall import OMBManagerInstall, OMB_RM_BIN, BRANDING, BOX_NAME,
 from OMBManagerAbout import OMBManagerAbout
 from OMBManagerCommon import OMB_DATA_DIR, OMB_UPLOAD_DIR
 from Components.Label import Label
+from boxbranding import getBoxType
 from OMBManagerLocale import _
 from enigma import eTimer, getDesktop
 import os
@@ -363,22 +364,13 @@ class OMBManagerList(Screen):
 						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
 
 	def isCompatible(self, base_path):
-		running = BOX_NAME
+		running = getBoxType()
 		b_type = "none"
-		if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-			running = "vu" + BOX_NAME
-		if running == "et11000":
-			running = "et1"
-		if running == "lunix3-4k":
-			running = "lunix3"
 
 		archconffile = "%s/etc/hostname" % base_path
 		if os.path.exists(archconffile):
 			f = open(archconffile, "r")
-			try:
-				b_type = str(f.read().lower().strip())
-			except:
-				pass
+			b_type = str(f.read().lower().strip())
 			f.close()
 		if running == b_type or running in b_type:
 			return True
@@ -403,15 +395,9 @@ class OMBManagerList(Screen):
 			e2_path = base_path + '/usr/lib/enigma2/python'
 			if os.path.exists(e2_path + '/boxbranding.so'):
 				helper = os.path.dirname("/usr/bin/python " + os.path.abspath(__file__)) + "/open-multiboot-branding-helper.py"
-				fin,fout = os.popen4(helper + " " + e2_path + " brand_oem")
-				brand_oem = fout.read().strip()
 				fin,fout = os.popen4(helper + " " + e2_path + " box_type")
 				box_type = fout.read().strip()
-
-				if brand_oem == "vuplus" and box_type and box_type[0:2] != "vu":
-					box_type = "vu" + box_type
-
-				if running == box_type or running in box_type:
+				if running == box_type or running in box_type or box_type in running:
 					return True
 
 		except:

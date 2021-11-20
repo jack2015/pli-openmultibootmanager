@@ -532,7 +532,6 @@ class OMBManagerInstall(Screen):
 			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-
 			else:
 				self.afterInstallImage(target_folder)
 				os.system(OMB_RM_BIN + ' -f ' + source_file)

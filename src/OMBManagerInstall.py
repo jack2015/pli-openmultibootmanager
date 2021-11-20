@@ -414,7 +414,7 @@ class OMBManagerInstall(Screen):
 			dm800se_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm800se-patch.tar.xz'
 			self.dream_path = dm800se_path
 			if not os.path.exists(dm800se_path):
-				cmd += "%s dm800se_patch %s" % (loadScript,patch_path)
+				cmd = "%s dm800se_patch %s" % (loadScript,patch_path)
 				text = _("Download DM800SE clone patch files")
 				self.session.openWithCallback(self.afterLoadpatchInstalldm800se, Console, text, [cmd])
 				return

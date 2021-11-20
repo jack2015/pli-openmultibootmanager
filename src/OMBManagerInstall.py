@@ -533,6 +533,7 @@ class OMBManagerInstall(Screen):
 		elif tarxzfile:
 			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.afterInstallImage(target_folder)
@@ -546,6 +547,7 @@ class OMBManagerInstall(Screen):
 		elif targzfile:
 			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.afterInstallImage(target_folder)
@@ -559,6 +561,7 @@ class OMBManagerInstall(Screen):
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.afterInstallImage(target_folder)

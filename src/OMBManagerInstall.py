@@ -506,6 +506,7 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder)
 					if not os.path.exists(target_folder + "/usr/bin/enigma2"):
 						self.showError(_("Cannot extract nfi image"))
+						os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 					else:
 						self.afterInstallImage(target_folder)
@@ -533,7 +534,7 @@ class OMBManagerInstall(Screen):
 		elif tarxzfile:
 			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
-				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.afterInstallImage(target_folder)
@@ -547,7 +548,7 @@ class OMBManagerInstall(Screen):
 		elif targzfile:
 			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
-				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.afterInstallImage(target_folder)
@@ -561,7 +562,7 @@ class OMBManagerInstall(Screen):
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
-				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.afterInstallImage(target_folder)
@@ -579,6 +580,7 @@ class OMBManagerInstall(Screen):
 			self.close(target_folder)
 
 		else:
+			os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
 	def installImage(self, src_path, dst_path, kernel_dst_path, tmp_folder):

@@ -112,9 +112,55 @@ case $1 in
 		fi
 		exit 0
 	;;
+	dm800se_patch)
+		SRC="https://jack2015.github.io/basefile/dm800se-patch.tar.xz"
+		DEST="$2/dm800se-patch.tar.xz"
+		if ! [ -d $2 ] ; then
+			mkdir -p $2
+		fi
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
+		else
+			echo >&2 "download-dm800se-patch: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
+			fi
+		fi
+		if ! [ -f $DEST ] ; then
+			echo >&2 "download-dm800se-patch: download failed"
+			exit 1
+		else
+			echo >&2 "Download dm800se patch done. Please try install image again."
+		fi
+		exit 0
+	;;
+	dm900_patch)
+		SRC="https://jack2015.github.io/basefile/dm900-patch.tar.xz"
+		DEST="$2/dm900-patch.tar.xz"
+		if ! [ -d $2 ] ; then
+			mkdir -p $2
+		fi
+		if which wget >/dev/null 2>&1 ; then
+			wget --no-check-certificate -O $DEST $SRC
+		else
+			echo >&2 "download-dm900-patch: cannot find wget"
+			opkg update && opkg install wget
+			if which wget >/dev/null 2>&1 ; then
+				wget --no-check-certificate -O $DEST $SRC
+			fi
+		fi
+		if ! [ -f $DEST ] ; then
+			echo >&2 "download-dm900-patch: download failed"
+			exit 1
+		else
+			echo >&2 "Download dm900 patch done. Please try install image again."
+		fi
+		exit 0
+	;;
 	*)
 		echo " "
-		echo "Options: $0 {formuler1|formuler3|formuler4|multiboot_formuler|dmm_nfidump}"
+		echo "Options: $0 {formuler1|formuler3|formuler4|multiboot_formuler|dmm_nfidump|dm800se_patch|dm900_patch}"
 		echo " "
 esac
 

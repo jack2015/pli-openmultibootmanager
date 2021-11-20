@@ -34,6 +34,7 @@ from Components.config import config
 from OMBManagerCommon import OMB_MAIN_DIR, OMB_DATA_DIR, OMB_UPLOAD_DIR, OMB_TMP_DIR
 from OMBManagerLocale import _
 from enigma import eTimer, getDesktop
+from Screens.Console import Console
 import os
 import glob
 import struct
@@ -326,6 +327,9 @@ class OMBManagerInstall(Screen):
 		self.session = session
 		self.mount_point = mount_point
 		self.alt_install = False
+		self.dm900_clone_install = False
+		self.dm800se_clone_install = False
+		self.dream_path = ""
 		self.esize = "128KiB"
 		self.vid_offset = "2048"
 		self.nandsim_parm = "first_id_byte=0x20 second_id_byte=0xac third_id_byte=0x00 fourth_id_byte=0x15"
@@ -368,6 +372,10 @@ class OMBManagerInstall(Screen):
 	def keyInstall(self):
 		text = _("Please select the necessary option...")
 		menu = [(_("Standard install"), "standard"), (_("Use altenative folder"), "altenative")]
+		if BOX_NAME == "dm900":
+			menu.append((_("Install DM900 with clone patch"), "dm900clone"))
+		elif BOX_NAME == "dm800se":
+			menu.append((_("Install DM800SE with clone patch"), "dm800seclone"))
 		def setAction(choice):
 			if choice:
 				if choice[1] == "standard":
@@ -376,12 +384,41 @@ class OMBManagerInstall(Screen):
 				elif choice[1] == "altenative":
 					self.alt_install = True
 					self.keyPostInstall()
+				elif choice[1] == "dm900clone":
+					self.dm900_clone_install = True
+					self.keyPostInstall()
+				elif choice[1] == "dm800seclone":
+					self.dm800se_clone_install = True
+					self.keyPostInstall()
+
 		dlg = self.session.openWithCallback(setAction, ChoiceBox, title=text, list=menu)
 
 	def keyPostInstall(self):
 		self.selected_image = self["list"].getCurrent()
 		if not self.selected_image:
 			return
+
+		patch_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch'
+		loadScript = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/install-nandsim.sh"
+
+		if self.dm900_clone_install and BOX_NAME == "dm900":
+			dm900_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm900-patch.tar.xz'
+			self.dream_path = dm900_path
+			if not os.path.exists(dm900_path):
+				cmd = "%s dm900_patch %s" % (loadScript,patch_path)
+				text = _("Download DM900 clone patch files")
+				self.session.openWithCallback(self.afterLoadpatchInstalldm900, Console, text, [cmd])
+				return
+
+		if self.dm800se_clone_install and BOX_NAME == "dm800se":
+			dm800se_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm800se-patch.tar.xz'
+			self.dream_path = dm800se_path
+			if not os.path.exists(dm800se_path):
+				cmd += "%s dm800se_patch %s" % (loadScript,patch_path)
+				text = _("Download DM800SE clone patch files")
+				self.session.openWithCallback(self.afterLoadpatchInstalldm800se, Console, text, [cmd])
+				return
+
 		self.messagebox = self.session.open(MessageBox, _('Please wait while installation is in progress.\nThis operation may take a while.'), MessageBox.TYPE_INFO, enable_input = False)
 		self.timer = eTimer()
 		self.timer.callback.append(self.installPrepare)
@@ -453,7 +490,9 @@ class OMBManagerInstall(Screen):
 			self.showError(_("Cannot deflate image"))
 			return
 		nfifile = glob.glob('%s/*.nfi' % tmp_folder)
-		tarxzfile = glob.glob('%s/*.rootfs.tar.xz' % tmp_folder)
+		tarxzfile = glob.glob('%s/*.tar.xz' % tmp_folder)
+		targzfile = glob.glob('%s/*.tar.gz' % tmp_folder)
+		tarbz2file = glob.glob('%s/*.tar.bz2' % tmp_folder)
 		if nfifile:
 			if BOX_MODEL != "dreambox":
 				self.showError(_("Your STB doesn\'t seem supported"))
@@ -489,20 +528,37 @@ class OMBManagerInstall(Screen):
 						self.close(target_folder)
 			else:
 				self.showError(_("Your STB doesn\'t seem supported"))
-		if tarxzfile:
-			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0:
-				if not os.path.exists(target_folder + "/usr/bin/enigma2"):
-					self.showError(_("Error unpacking rootfs"))
-					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-				else:
-					self.afterInstallImage(target_folder)
-					os.system(OMB_RM_BIN + ' -f ' + source_file)
-					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-					self.messagebox.close()
-					self.close(target_folder)
-			else:
+		elif tarxzfile:
+			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+
+			else:
+				self.afterInstallImage(target_folder)
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				self.messagebox.close()
+				self.close(target_folder)
+		elif targzfile:
+			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+				self.showError(_("Error unpacking rootfs"))
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+			else:
+				self.afterInstallImage(target_folder)
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				self.messagebox.close()
+				self.close(target_folder)
+		elif tarbz2file:
+			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+				self.showError(_("Error unpacking rootfs"))
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+			else:
+				self.afterInstallImage(target_folder)
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				self.messagebox.close()
+				self.close(target_folder)
 		elif self.installImage(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 			os.system(OMB_RM_BIN + ' -f ' + source_file)
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
@@ -712,6 +768,7 @@ class OMBManagerInstall(Screen):
 		return True
 
 	def afterInstallImage(self, dst_path=""):
+		dst_path = dst_path.rstrip("/")
 		if not os.path.exists(dst_path + "/sbin"):
 			return
 		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
@@ -749,3 +806,19 @@ class OMBManagerInstall(Screen):
 						print "mountpoint -q \"/media\" || mount -t tmpfs -o size=64k tmpfs /media"
 					else:
 						print line.rstrip()
+		if self.dm900_clone_install and BOX_NAME == "dm900":
+			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.14-1.17-dm900/extra')
+			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+		elif self.dm800se_clone_install and BOX_NAME == "dm800se":
+			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.2-dm800se/extra')
+			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+
+	def afterLoadpatchInstalldm900(self):
+		if not os.path.exists(self.dream_path):
+			self.error_message = _('Cannot download dm900 clone patch... ')
+			self.session.open(MessageBox, self.error_message, type = MessageBox.TYPE_ERROR)
+
+	def afterLoadpatchInstalldm800se(self):
+		if not os.path.exists(self.dream_path):
+			self.error_message = _('Cannot download dm800se clone patch... ')
+			self.session.open(MessageBox, self.error_message, type = MessageBox.TYPE_ERROR)

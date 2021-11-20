@@ -493,6 +493,7 @@ class OMBManagerInstall(Screen):
 		tarxzfile = glob.glob('%s/*.tar.xz' % tmp_folder)
 		targzfile = glob.glob('%s/*.tar.gz' % tmp_folder)
 		tarbz2file = glob.glob('%s/*.tar.bz2' % tmp_folder)
+
 		if nfifile:
 			if BOX_MODEL != "dreambox":
 				self.showError(_("Your STB doesn\'t seem supported"))
@@ -528,6 +529,7 @@ class OMBManagerInstall(Screen):
 						self.close(target_folder)
 			else:
 				self.showError(_("Your STB doesn\'t seem supported"))
+
 		elif tarxzfile:
 			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
@@ -538,6 +540,9 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
+				if BOX_NAME in ("dm900", "dm920"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+
 		elif targzfile:
 			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
@@ -548,6 +553,9 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
+				if BOX_NAME in ("dm900", "dm920"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
@@ -558,11 +566,15 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
+				if BOX_NAME in ("dm900", "dm920"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+
 		elif self.installImage(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 			os.system(OMB_RM_BIN + ' -f ' + source_file)
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			self.messagebox.close()
 			self.close(target_folder)
+
 		else:
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 

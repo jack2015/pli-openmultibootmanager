@@ -544,6 +544,10 @@ class OMBManagerInstall(Screen):
 				self.close(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+				elif BOX_NAME in ("dm820", "dm7080"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
+				elif BOX_NAME in ("dm520", "dm525"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 
 		elif targzfile:
 			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -558,6 +562,10 @@ class OMBManagerInstall(Screen):
 				self.close(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+				elif BOX_NAME in ("dm820", "dm7080"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
+				elif BOX_NAME in ("dm520", "dm525"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -572,6 +580,10 @@ class OMBManagerInstall(Screen):
 				self.close(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+				elif BOX_NAME in ("dm820", "dm7080"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
+				elif BOX_NAME in ("dm520", "dm525"):
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 
 		elif self.installImage(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 			os.system(OMB_RM_BIN + ' -f ' + source_file)

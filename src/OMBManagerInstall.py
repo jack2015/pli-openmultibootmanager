@@ -509,8 +509,13 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 					else:
-						self.afterInstallImage(target_folder)
-						os.system(OMB_RM_BIN + ' -f ' + source_file)
+						if self.afterInstallImage(target_folder):
+							os.system(OMB_RM_BIN + ' -f ' + source_file)
+						else:
+							self.showError(_("This firmware is not suitable for this machine"))
+							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+							os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+							return
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 						self.messagebox.close()
 						self.close(target_folder)
@@ -537,8 +542,13 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				self.afterInstallImage(target_folder)
-				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				if self.afterInstallImage(target_folder):
+					os.system(OMB_RM_BIN + ' -f ' + source_file)
+				else:
+					self.showError(_("This firmware is not suitable for this machine"))
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					return
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
@@ -555,8 +565,13 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				self.afterInstallImage(target_folder)
-				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				if self.afterInstallImage(target_folder):
+					os.system(OMB_RM_BIN + ' -f ' + source_file)
+				else:
+					self.showError(_("This firmware is not suitable for this machine"))
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					return
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
@@ -573,8 +588,13 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				self.afterInstallImage(target_folder)
-				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				if self.afterInstallImage(target_folder):
+					os.system(OMB_RM_BIN + ' -f ' + source_file)
+				else:
+					self.showError(_("This firmware is not suitable for this machine"))
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					return
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
@@ -623,8 +643,10 @@ class OMBManagerInstall(Screen):
 		else:
 			self.showError(_("Error unpacking rootfs"))
 			return False
-		self.afterInstallImage(dst_path)
-		return True
+		if self.afterInstallImage(dst_path):
+			return True
+		else:
+			return False
 
 	def installImageJFFS2(self, src_path, dst_path, kernel_dst_path, tmp_folder):
 		rc = True
@@ -670,7 +692,12 @@ class OMBManagerInstall(Screen):
 			os.system(OMB_RMMOD_BIN + ' block2mtd')
 			os.system(OMB_RMMOD_BIN + ' mtdblock')
 			os.system(OMB_RMMOD_BIN + ' loop')
-		self.afterInstallImage(dst_path)
+
+		if self.afterInstallImage(dst_path):
+			rc = True
+		else:
+			rc = False
+
 		return rc
 
 	def installImageUBI(self, src_path, dst_path, kernel_dst_path, tmp_folder):
@@ -730,7 +757,12 @@ class OMBManagerInstall(Screen):
 		os.system(OMB_UMOUNT_BIN + ' ' + ubi_path)
 		os.system(OMB_UBIDETACH_BIN + ' -m ' + mtd)
 		os.system(OMB_RMMOD_BIN + ' nandsim')
-		self.afterInstallImage(dst_path)
+
+		if self.afterInstallImage(dst_path):
+			rc = True
+		else:
+			rc = False
+
 		return rc
 
 	def extractImageNFI(self, nfifile, extractdir):
@@ -798,7 +830,15 @@ class OMBManagerInstall(Screen):
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
 		if not os.path.exists(dst_path + "/sbin"):
-			return
+			return False
+		if os.path.exists(dst_path + '/etc/hostname'):
+			f = open(dst_path + '/etc/hostname', "r")
+			b_type = str(f.read().lower().strip())
+			f.close()
+			if BOX_NAME != b_type and BOX_NAME not in b_type:
+				return False
+		else:
+			return False
 		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
 			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
 		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
@@ -840,6 +880,7 @@ class OMBManagerInstall(Screen):
 		elif self.dm800se_clone_install and BOX_NAME == "dm800se":
 			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.2-dm800se/extra')
 			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+		return True
 
 	def afterLoadpatchInstalldm900(self):
 		if not os.path.exists(self.dream_path):

@@ -25,8 +25,8 @@ import sys
 KEYS_FNC_MAP = {
 	'machine_build': 'boxbranding.getMachineBuild()',
 	'machine_proc_model': 'boxbranding.getMachineProcModel()',
-	'machine_brand': 'boxbranding.getMachineBrand()',
-	'machine_name': 'boxbranding.getMachineName()',
+	'machine_brand': 'boxbranding.getBoxBrand()',
+	'machine_name': 'boxbranding.getBoxType()',
 	'machine_mtd_kernel': 'boxbranding.getMachineMtdKernel()',
 	'machine_kernel_file': 'boxbranding.getMachineKernelFile()',
 	'machine_mtd_root': 'boxbranding.getMachineMtdRoot()',
@@ -34,9 +34,8 @@ KEYS_FNC_MAP = {
 	'machine_mkubifs': 'boxbranding.getMachineMKUBIFS()',
 	'machine_ubinize': 'boxbranding.getMachineUBINIZE()',
 	'box_type': 'boxbranding.getBoxType()',
-	'brand_oem': 'boxbranding.getBrandOEM()',
+	'brand_oem': 'boxbranding.getBoxBrand()',
 	'oe_version': 'boxbranding.getOEVersion()',
-	'driver_date': 'boxbranding.getDriverDate()',
 	'image_version': 'boxbranding.getImageVersion()',
 	'image_build': 'boxbranding.getImageBuild()',
 	'image_distro': 'boxbranding.getImageDistro()',
@@ -69,7 +68,7 @@ else:
 			for key in list(KEYS_FNC_MAP.keys()):
 				print(key + ' = ' + eval(KEYS_FNC_MAP[key]))
 		else:
-			if WORKAROUND or (sys.argv[2] == 'image_distro' or sys.argv[2] == 'image_version'):
+			if WORKAROUND:
 				if sys.argv[2] == 'image_distro':
 					try:
 						print(open(sys.argv[1].replace("/usr/lib/enigma2/python","")+"/etc/issue").readlines()[-2].capitalize().strip()[:-6])
@@ -88,6 +87,6 @@ else:
 					except:
 						print(" ")
 				else:
-					print("opps")
+					pass
 			else:
 				print(eval(KEYS_FNC_MAP[sys.argv[2]]))

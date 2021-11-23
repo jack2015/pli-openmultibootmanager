@@ -553,7 +553,7 @@ class OMBManagerInstall(Screen):
 				self.messagebox.close()
 				self.close(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
 				elif BOX_NAME in ("dm820", "dm7080"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
@@ -576,7 +576,7 @@ class OMBManagerInstall(Screen):
 				self.messagebox.close()
 				self.close(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
 				elif BOX_NAME in ("dm820", "dm7080"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
@@ -599,7 +599,7 @@ class OMBManagerInstall(Screen):
 				self.messagebox.close()
 				self.close(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage ' + kernel_target_file)
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
 				elif BOX_NAME in ("dm820", "dm7080"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):

@@ -39,7 +39,6 @@ from .OMBManagerInstall import OMBManagerInstall, OMB_RM_BIN, BRANDING, BOX_NAME
 from .OMBManagerAbout import OMBManagerAbout
 from .OMBManagerCommon import OMB_DATA_DIR, OMB_UPLOAD_DIR
 from Components.Label import Label
-from boxbranding import getBoxType
 from .OMBManagerLocale import _
 from enigma import eTimer, getDesktop
 import os
@@ -364,7 +363,17 @@ class OMBManagerList(Screen):
 						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
 
 	def isCompatible(self, base_path):
-		running = getBoxType()
+		if os.path.exists("/etc/.box_type"):
+			f = open("/etc/.box_type", "r")
+			running = str(f.read().lower().strip())
+			f.close()
+		else:
+			if os.path.exists("/etc/hostname"):
+				f = open("/etc/hostname", "r")
+				running = str(f.read().lower().strip())
+				f.close()
+			else:
+				running = BOX_NAME
 		b_type = "none"
 
 		archconffile = "%s/etc/hostname" % base_path

@@ -239,7 +239,7 @@ elif BRANDING and WORKAROUND:
 	elif BOX_MODEL == "dreambox":
 		if BOX_NAME == "dm500hd" or BOX_NAME == "dm800" or BOX_NAME == "dm800se":
 			OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
-		elif BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or "dm500hdv2" or BOX_NAME == "dm800sev2":
+		elif BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or BOX_NAME == "dm500hdv2" or BOX_NAME == "dm800sev2":
 			OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
 		elif BOX_NAME == "dm900":
 			OMB_GETMACHINEKERNELFILE = "kernel.bin"

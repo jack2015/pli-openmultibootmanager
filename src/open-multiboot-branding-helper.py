@@ -58,7 +58,7 @@ else:
 			for key in list(KEYS_FNC_MAP.keys()):
 				print(key + ' = ' + eval(KEYS_FNC_MAP[key]))
 		else:
-			if WORKAROUND or (sys.argv[2] == 'image_distro' or sys.argv[2] == 'image_version'):
+			if WORKAROUND or (sys.argv[2] == 'image_distro' or sys.argv[2] == 'image_version' or sys.argv[2] == 'brand_oem' or sys.argv[2] == 'box_type'):
 				if sys.argv[2] == 'image_distro':
 					try:
 						print(open(sys.argv[1].replace("/usr/lib/enigma2/python","")+"/etc/issue").readlines()[-2].capitalize().strip()[:-6])

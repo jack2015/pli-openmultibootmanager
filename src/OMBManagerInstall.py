@@ -40,239 +40,81 @@ import glob
 import struct
 import fileinput
 
+BOX_NAME = ""
+BOX_MODEL = ""
+
 try:
 	screenWidth = getDesktop(0).size().width()
 except:
 	screenWidth = 720
 
 try:
-	device_name = HardwareInfo().get_device_name()
-except:
-	device_name = None
-
-BOX_MODEL = ""
-BOX_NAME = ""
-if fileExists("/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/boxtype") and not fileExists("/proc/stb/info/gbmodel"):
-	try:
-		l = open("/proc/stb/info/vumodel")
-		model = l.read()
-		BOX_NAME = str(model.lower().strip())
-		l.close()
-		BOX_MODEL = "vuplus"
-	except:
-		pass
-elif fileExists("/proc/stb/info/boxtype") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/gbmodel"):
-	try:
-		l = open("/proc/stb/info/boxtype")
-		model = l.read()
-		BOX_NAME = str(model.lower().strip())
-		l.close()
-		if BOX_NAME.startswith('et'):
-			BOX_MODEL = "xtrend"
-			if BOX_NAME.startswith('et7') and BOX_NAME.endswith('mini'):
-				BOX_MODEL = "ultramini"
-		elif BOX_NAME.startswith('xpeed'):
-			BOX_MODEL = "ultramini"
-		elif BOX_NAME.startswith('xp'):
-			BOX_MODEL = "xp"
-		elif BOX_NAME.startswith('spycat'):
-			BOX_MODEL = "spycat"
-		elif BOX_NAME.startswith('formuler'):
-			BOX_MODEL = "formuler"
-		elif BOX_NAME.startswith('hd'):
-			BOX_MODEL = "gfutures"
-		elif BOX_NAME.startswith('vs'):
-			BOX_MODEL = "gfutures"
-		elif BOX_NAME.startswith('e4hd'):
-			BOX_MODEL = "gfutures"
-		elif BOX_NAME.startswith('osm'):
-			BOX_MODEL = "xcore"
-		elif BOX_NAME.startswith('g300') or BOX_NAME.startswith('7000S'):
-			BOX_MODEL = "ini"
-		elif BOX_NAME.startswith('viper'):
-			BOX_MODEL = "entwopia"
-		elif BOX_NAME == 'sh1' or BOX_NAME == 'h3' or BOX_NAME == 'h4' or BOX_NAME == 'h5' or BOX_NAME == 'lc' or BOX_NAME == 'i55' or BOX_NAME == 'h7':
-			BOX_MODEL = "airdigital"
-	except:
-		pass
-elif fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/gbmodel"):
-	try:
-		l = open("/proc/stb/info/hwmodel")
-		model = l.read()
-		BOX_NAME = str(model.lower().strip())
-		l.close()
-		BOX_MODEL = "qviart"
-	except:
-		pass
-	if BOX_NAME.startswith('fusion') or BOX_NAME.startswith("purehd"):
-		BOX_MODEL = "xsarius"
-elif fileExists("/proc/stb/info/model") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/gbmodel"):
-	try:
-		l = open("/proc/stb/info/model")
-		model = l.read()
-		BOX_NAME = str(model.lower().strip())
-		l.close()
-		if BOX_NAME.startswith('dm'):
-			BOX_MODEL = "dreambox"
-	except:
-		pass
-elif fileExists("/proc/stb/info/gbmodel") and not fileExists("/proc/stb/info/hwmodel"):
-	try:
-		l = open("/proc/stb/info/gbmodel")
-		model = l.read()
-		BOX_NAME = str(model.lower().strip())
-		l.close()
-		if BOX_NAME.startswith('gb'):
-			BOX_MODEL = "gigablue"
-	except:
-		pass
-
-WORKAROUND = False
-box = ''
-try:
-	from boxbranding import *
+	from boxbranding import getBoxType, getBrandOEM, getImageDistro, getImageVersion, getImageFileSystem, getImageFolder, getMachineKernelFile, getMachineRootFile
 	BRANDING = True
-except ImportError:
-	try:
-		if BOX_MODEL:
-			from enigma import getBoxType
-			box = getBoxType()
-			BRANDING = True
-			WORKAROUND = True
-		else:
-			BRANDING = False
-	except:
-		BRANDING = False
+except:
+	BRANDING = False
 
-if BOX_NAME and not os.path.exists('/etc/.box_type'):
-	box_name = BOX_NAME
-	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
- 		box_name = "vu" + BOX_NAME
-	os.system("echo %s > /etc/.box_type" % box_name)
-if BOX_MODEL and not os.path.exists('/etc/.brand_oem'):
-	os.system("echo %s > /etc/.brand_oem" % BOX_MODEL)
-
-OMB_GETMACHINEBUILD = str(box)
-OMB_GETIMAGEFILESYSTEM = "ubi"
-OMB_GETIMAGEFOLDER = str(box)
-OMB_GETMACHINEKERNELFILE = "kernel.bin"
-OMB_GETMACHINEROOTFILE = "rootfs.bin"
-
-if BRANDING and not WORKAROUND:
-	OMB_GETIMAGEFILESYSTEM = getImageFileSystem()
-	OMB_GETIMAGEFOLDER = getImageFolder()
-	OMB_GETMACHINEKERNELFILE = getMachineKernelFile()
-	OMB_GETMACHINEROOTFILE = getMachineRootFile()
-	OMB_GETMACHINEBUILD = getMachineBuild()
-	if 'emmc' in OMB_GETIMAGEFILESYSTEM:
-		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd" or BOX_NAME == "lunix3-4k":
-			OMB_GETMACHINEKERNELFILE = "kernel1.bin"
-			if BOX_NAME == "lunix3-4k":
-				OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-elif BRANDING and WORKAROUND:
-	OMB_GETIMAGEFOLDER = BOX_NAME
-	if BOX_MODEL == "vuplus":
-		OMB_GETIMAGEFOLDER = "vuplus/" + BOX_NAME
-		OMB_GETMACHINEKERNELFILE = "kernel_cfe_auto.bin"
-		if BOX_NAME == "solo2" or BOX_NAME == "duo2" or BOX_NAME == "solose" or BOX_NAME == "zero":
-			OMB_GETMACHINEROOTFILE = "root_cfe_auto.bin"
-		elif BOX_NAME == "solo4k" or BOX_NAME == "uno4k" or BOX_NAME == "uno4kse" or BOX_NAME == "ultimo4k" or BOX_NAME == "zero4k" or BOX_NAME == "duo4k" or BOX_NAME == "duo4kse":
-			OMB_GETMACHINEKERNELFILE = "kernel_auto.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-		else:
-			OMB_GETMACHINEROOTFILE = "root_cfe_auto.jffs2"
-	elif BOX_MODEL == "xsarius":
-		OMB_GETIMAGEFOLDER = "update/" + BOX_NAME + "/cfe"
-		OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
-		OMB_GETMACHINEROOTFILE = "oe_rootfs.bin"
-	elif BOX_MODEL == "entwopia":
-		OMB_GETIMAGEFOLDER = BOX_NAME
-		OMB_GETMACHINEKERNELFILE = "kernel.bin"
-		OMB_GETMACHINEROOTFILE = "rootfs.bin"
-	elif BOX_NAME == "lunix3-4k" or BOX_NAME == "lunix4k":
-		OMB_GETIMAGEFOLDER = "update/" + BOX_NAME
-		OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
-		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-	elif BOX_NAME == "gbquad4k" or BOX_NAME == "gbue4k":
-		OMB_GETIMAGEFOLDER = "gigablue/" + (BOX_NAME == "gbue4k" and "ue4k" or "quad4k")
-		OMB_GETMACHINEKERNELFILE = "kernel.bin"
-		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-	elif BOX_MODEL == "xtrend":
-		if BOX_NAME.startswith("et7"):
-			OMB_GETIMAGEFOLDER = "et7x00"
-		elif BOX_NAME.startswith("et9"):
-			OMB_GETIMAGEFOLDER = "et9x00"
-		elif BOX_NAME.startswith("et5"):
-			OMB_GETIMAGEFOLDER = "et5x00"
-		elif BOX_NAME.startswith("et6"):
-			OMB_GETIMAGEFOLDER = "et6x00"
-		elif BOX_NAME.startswith("et11"):
-			OMB_GETIMAGEFOLDER = "et1x000"
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-		elif BOX_NAME.startswith("et13"):
-			OMB_GETIMAGEFOLDER = "et13000"
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-		if BOX_NAME.startswith('g300'):
-			OMB_GETIMAGEFOLDER = "miraclebox/" + 'twinplus'
-		elif BOX_NAME.startswith('7000S'):
-			OMB_GETIMAGEFOLDER = "miraclebox/" + 'micro'
-	elif BOX_MODEL == "gfutures":
-		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd":
-			OMB_GETMACHINEKERNELFILE = "kernel1.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-	elif BOX_MODEL == "airdigital":
-		OMB_GETIMAGEFOLDER = "zgemma/" + BOX_NAME
-		if BOX_NAME == "h7":
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-	elif BOX_MODEL == "dreambox":
-		if BOX_NAME == "dm500hd" or BOX_NAME == "dm800" or BOX_NAME == "dm800se":
-			OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
-		elif BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or "dm500hdv2" or BOX_NAME == "dm800sev2":
-			OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
-		elif BOX_NAME == "dm900":
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-			OMB_GETIMAGEFOLDER = "dm900"
-		elif BOX_NAME == "dm920":
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-			OMB_GETIMAGEFOLDER = "dm920"
-		elif BOX_NAME == "dm520" or BOX_NAME == "dm525" or BOX_NAME == "dm820" or BOX_NAME == "dm7080":
-			OMB_GETIMAGEFILESYSTEM = "tar.xz"
-		else:
-			OMB_GETIMAGEFILESYSTEM = ""
+if BRANDING:
+	BOX_NAME = getBoxType()
+	OMB_GETBOXTYPE = getBoxType()
+	BOX_MODEL = getBrandOEM()
+	OMB_GETBRANDOEM = getBrandOEM()
+	OMB_GETIMAGEDISTRO = getImageDistro()
+	OMB_GETIMAGEVERSION = getImageVersion()
+	OMB_GETIMAGEFILESYSTEM = getImageFileSystem() # needed
+	OMB_GETIMAGEFOLDER = getImageFolder() # needed
+	OMB_GETMACHINEKERNELFILE = getMachineKernelFile() # needed
+	OMB_GETMACHINEROOTFILE = getMachineRootFile() # needed
 else:
-	f = open("/proc/mounts","r")
+	OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+	f = open("/proc/mounts", "r")
 	for line in f:
 		if line.find("rootfs") > -1:
 			if line.find("ubi") > -1:
 				OMB_GETIMAGEFILESYSTEM = "ubi"
 				break
-			if line.find("tar.bz2") > -1:
-				OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-				break
 			if line.find("jffs2") > -1:
 				OMB_GETIMAGEFILESYSTEM = "jffs2"
 				break
-			if line.find("tar.xz") > -1:
-				OMB_GETIMAGEFILESYSTEM = "tar.xz"
-				break
+
+	if os.path.exists('/etc/hostname'):
+		f = open("/etc/hostname", "r")
+		BOX_NAME = f.read().lower().strip()
+		f.close()
+		if BOX_NAME[0:2] == "dm":
+			BOX_MODEL = "dreambox"
+
+if BOX_NAME:
+	box_name = BOX_NAME
+	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
+ 		box_name = "vu" + BOX_NAME
+	f = open('/etc/.box_type', "w")
+	f.write(box_name)
+	f.close()
+if BOX_MODEL:
+	f = open('/etc/.brand_oem', "w")
+	f.write(BOX_MODEL)
 	f.close()
 
+if BOX_MODEL == "dreambox":
+	if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
+		OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
+	elif BOX_NAME in ("dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
+		OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
+	elif BOX_NAME == "dm900":
+		OMB_GETMACHINEKERNELFILE = "kernel.bin"
+		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+		OMB_GETIMAGEFOLDER = "dm900"
+	elif BOX_NAME == "dm920":
+		OMB_GETMACHINEKERNELFILE = "kernel.bin"
+		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+		OMB_GETIMAGEFOLDER = "dm920"
+	elif BOX_NAME in ("dm520", "dm525", "dm820", "dm7080"):
+		OMB_GETIMAGEFILESYSTEM = "tar.xz"
+	else:
+		OMB_GETIMAGEFILESYSTEM = ""
 
 OMB_DD_BIN = '/bin/dd'
 OMB_CP_BIN = '/bin/cp'

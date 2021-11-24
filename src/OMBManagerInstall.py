@@ -331,10 +331,11 @@ class OMBManagerInstall(Screen):
 		if os.system(OMB_UNZIP_BIN + ' ' + source_file + ' -d ' + tmp_folder) != 0:
 			self.showError(_("Cannot deflate image"))
 			return
+
 		nfifile = glob.glob('%s/*.nfi' % tmp_folder)
-		tarxzfile = glob.glob('%s/*.tar.xz' % tmp_folder)
-		targzfile = glob.glob('%s/*.tar.gz' % tmp_folder)
-		tarbz2file = glob.glob('%s/*.tar.bz2' % tmp_folder)
+		tarxzfile = glob.glob('%s/*.xz' % tmp_folder)
+		targzfile = glob.glob('%s/*.gz' % tmp_folder)
+		tarbz2file = glob.glob('%s/*.bz2' % tmp_folder)
 
 		if nfifile:
 			if BOX_MODEL != "dreambox":
@@ -379,7 +380,7 @@ class OMBManagerInstall(Screen):
 				self.showError(_("Your STB doesn\'t seem supported"))
 
 		elif tarxzfile:
-			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+			if os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
@@ -400,6 +401,7 @@ class OMBManagerInstall(Screen):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+			return
 
 		elif targzfile:
 			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -423,6 +425,7 @@ class OMBManagerInstall(Screen):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+			return
 
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -446,6 +449,7 @@ class OMBManagerInstall(Screen):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+			return
 
 		elif self.installImage(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 			os.system(OMB_RM_BIN + ' -f ' + source_file)
@@ -456,6 +460,8 @@ class OMBManagerInstall(Screen):
 		else:
 			os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+			self.messagebox.close()
+			self.close(target_folder)
 
 	def installImage(self, src_path, dst_path, kernel_dst_path, tmp_folder):
 		if "ubi" in OMB_GETIMAGEFILESYSTEM:
@@ -475,7 +481,7 @@ class OMBManagerInstall(Screen):
 		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd":
 			if OMB_GETMACHINEKERNELFILE == "kernel1.bin" and not os.path.exists(kernel_path):
 				kernel_path = base_path + '/' + "kernel.bin"
-		if os.system(OMB_TAR_BIN + ' jxf %s -C %s' % (rootfs_path,dst_path)) != 0:
+		if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (rootfs_path,dst_path)) != 0:
 			self.showError(_("Error unpacking rootfs"))
 			return False
 		if os.path.exists(dst_path + '/usr/bin/enigma2'):
@@ -681,10 +687,10 @@ class OMBManagerInstall(Screen):
 				return False
 		else:
 			return False
-#		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-#			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
-#		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
-#			os.system("cp /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
+		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
+			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
+		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
+			os.system("cp /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
 #		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
 #			os.system("cp /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
 #			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')

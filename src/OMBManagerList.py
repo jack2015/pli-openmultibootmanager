@@ -345,7 +345,7 @@ class OMBManagerList(Screen):
 				os.system('rm -rf ' + sbin_path + '/init')
 				os.system('ln -s ' + sbin_path + '/init.sysvinit ' + sbin_path + '/init')
 			if os.path.isfile(sbin_path + '/open-multiboot-branding-helper.py'):
-				os.system('rm -rf ' + sbin_path + '/open-multiboot-branding-helper.py')
+				os.system('rm -f ' + sbin_path + '/open-multiboot-branding-helper.py')
 			if BOX_NAME and not os.path.exists(etc_path + '/.box_type'):
 				box_name = BOX_NAME
 				if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
@@ -353,14 +353,15 @@ class OMBManagerList(Screen):
 				os.system("echo %s > %s/.box_type" % (box_name, etc_path))
 			if BOX_MODEL and not os.path.exists(etc_path + '/.brand_oem'):
 				os.system("echo %s > %s/.brand_oem" % (BOX_MODEL, etc_path))
-			os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + sbin_path + '/open-multiboot-branding-helper.py')
-#			if self.checkflashImage():
+#			os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + sbin_path + '/open-multiboot-branding-helper.py')
+			if self.checkflashImage():
 #				if not os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
 #					if self.isCompatible(base_path):
 #						os.system("cp " + base_path + "/usr/lib/enigma2/python/boxbranding.so " "/usr/lib/enigma2/python/boxbranding.so")
-#				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
-#					if self.isCompatible(base_path):
-#						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
+				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
+					if self.isCompatible(base_path):
+						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
+						os.system("ln -s /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/python2.7/boxbranding.so")
 
 	def isCompatible(self, base_path):
 		if os.path.exists("/etc/.box_type"):

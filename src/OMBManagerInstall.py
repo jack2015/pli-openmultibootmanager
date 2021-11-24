@@ -681,13 +681,13 @@ class OMBManagerInstall(Screen):
 				return False
 		else:
 			return False
-		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
-		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
-			os.system("cp /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
-		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("cp /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
-			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')
+#		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
+#			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
+#		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
+#			os.system("cp /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
+#		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
+#			os.system("cp /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
+#			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')
 		if not os.path.exists(dst_path + "/usr/lib/python2.7/subprocess.pyo") and os.path.exists("/usr/lib/python2.7/subprocess.pyo"):
 			os.system("cp /usr/lib/python2.7/subprocess.pyo " + dst_path + "/usr/lib/python2.7/subprocess.pyo")
 		if os.path.isfile(dst_path + '/sbin/open_multiboot'):

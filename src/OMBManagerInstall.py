@@ -132,6 +132,8 @@ box = ''
 try:
 	from boxbranding import *
 	BRANDING = True
+	BOX_NAME = getBoxType()
+	BOX_MODEL = getBrandOEM()
 except ImportError:
 	try:
 		if BOX_MODEL:
@@ -144,13 +146,17 @@ except ImportError:
 	except:
 		BRANDING = False
 
-if BOX_NAME and not os.path.exists('/etc/.box_type'):
+if BOX_NAME:
 	box_name = BOX_NAME
 	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
  		box_name = "vu" + BOX_NAME
-	os.system("echo %s > /etc/.box_type" % box_name)
-if BOX_MODEL and not os.path.exists('/etc/.brand_oem'):
-	os.system("echo %s > /etc/.brand_oem" % BOX_MODEL)
+	f = open('/etc/.box_type', "w")
+	f.write(box_name)
+	f.close()
+if BOX_MODEL:
+	f = open('/etc/.brand_oem', "w")
+	f.write(BOX_MODEL)
+	f.close()
 
 OMB_GETMACHINEBUILD = str(box)
 OMB_GETIMAGEFILESYSTEM = "ubi"
@@ -178,7 +184,7 @@ elif BRANDING and WORKAROUND:
 		OMB_GETMACHINEKERNELFILE = "kernel_cfe_auto.bin"
 		if BOX_NAME == "solo2" or BOX_NAME == "duo2" or BOX_NAME == "solose" or BOX_NAME == "zero":
 			OMB_GETMACHINEROOTFILE = "root_cfe_auto.bin"
-		elif BOX_NAME == "solo4k" or BOX_NAME == "uno4k" or BOX_NAME == "uno4kse" or BOX_NAME == "ultimo4k" or BOX_NAME == "zero4k" or BOX_NAME == "duo4k" or BOX_NAME == "duo4kse":
+		elif BOX_NAME in ("solo4k", "uno4k", "uno4kse", "ultimo4k", "zero4k", "duo4k", "duo4kse"):
 			OMB_GETMACHINEKERNELFILE = "kernel_auto.bin"
 			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
@@ -237,9 +243,9 @@ elif BRANDING and WORKAROUND:
 			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
 	elif BOX_MODEL == "dreambox":
-		if BOX_NAME == "dm500hd" or BOX_NAME == "dm800" or BOX_NAME == "dm800se":
+		if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
 			OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
-		elif BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or BOX_NAME == "dm500hdv2" or BOX_NAME == "dm800sev2":
+		elif BOX_NAME in ("dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
 			OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
 		elif BOX_NAME == "dm900":
 			OMB_GETMACHINEKERNELFILE = "kernel.bin"
@@ -251,7 +257,7 @@ elif BRANDING and WORKAROUND:
 			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
 			OMB_GETIMAGEFOLDER = "dm920"
-		elif BOX_NAME == "dm520" or BOX_NAME == "dm525" or BOX_NAME == "dm820" or BOX_NAME == "dm7080":
+		elif BOX_NAME in ("dm520", "dm525", "dm820", "dm7080"):
 			OMB_GETIMAGEFILESYSTEM = "tar.xz"
 		else:
 			OMB_GETIMAGEFILESYSTEM = ""
@@ -489,10 +495,11 @@ class OMBManagerInstall(Screen):
 		if os.system(OMB_UNZIP_BIN + ' ' + source_file + ' -d ' + tmp_folder) != 0:
 			self.showError(_("Cannot deflate image"))
 			return
+
 		nfifile = glob.glob('%s/*.nfi' % tmp_folder)
-		tarxzfile = glob.glob('%s/*.tar.xz' % tmp_folder)
-		targzfile = glob.glob('%s/*.tar.gz' % tmp_folder)
-		tarbz2file = glob.glob('%s/*.tar.bz2' % tmp_folder)
+		tarxzfile = glob.glob('%s/*.xz' % tmp_folder)
+		targzfile = glob.glob('%s/*.gz' % tmp_folder)
+		tarbz2file = glob.glob('%s/*.bz2' % tmp_folder)
 
 		if nfifile:
 			if BOX_MODEL != "dreambox":
@@ -537,7 +544,7 @@ class OMBManagerInstall(Screen):
 				self.showError(_("Your STB doesn\'t seem supported"))
 
 		elif tarxzfile:
-			if os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+			if os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 				self.showError(_("Error unpacking rootfs"))
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
@@ -633,7 +640,7 @@ class OMBManagerInstall(Screen):
 		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd":
 			if OMB_GETMACHINEKERNELFILE == "kernel1.bin" and not os.path.exists(kernel_path):
 				kernel_path = base_path + '/' + "kernel.bin"
-		if os.system(OMB_TAR_BIN + ' jxf %s -C %s' % (rootfs_path,dst_path)) != 0:
+		if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (rootfs_path,dst_path)) != 0:
 			self.showError(_("Error unpacking rootfs"))
 			return False
 		if os.path.exists(dst_path + '/usr/bin/enigma2'):

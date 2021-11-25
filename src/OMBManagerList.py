@@ -35,7 +35,7 @@ from Components.config import config, ConfigSubsection, ConfigText
 from Components.Input import Input
 from Screens.InputBox import InputBox
 from Components.config import config
-from .OMBManagerInstall import OMBManagerInstall, OMB_RM_BIN, BRANDING, BOX_NAME, BOX_MODEL, OMB_GETIMAGEFOLDER, box
+from .OMBManagerInstall import OMBManagerInstall, OMB_RM_BIN, BRANDING, BOX_NAME, BOX_MODEL, OMB_GETIMAGEFOLDER
 from .OMBManagerAbout import OMBManagerAbout
 from .OMBManagerCommon import OMB_DATA_DIR, OMB_UPLOAD_DIR
 from Components.Label import Label
@@ -341,26 +341,31 @@ class OMBManagerList(Screen):
 		if os.path.exists(sbin_path):
 			etc_path = base_path + '/etc'
 			if os.path.isfile(sbin_path + '/open_multiboot'):
-				os.system('rm -rf ' + sbin_path + '/open_multiboot')
-				os.system('rm -rf ' + sbin_path + '/init')
-				os.system('ln -s ' + sbin_path + '/init.sysvinit ' + sbin_path + '/init')
-			if os.path.isfile(sbin_path + '/open-multiboot-branding-helper.py'):
-				os.system('rm -rf ' + sbin_path + '/open-multiboot-branding-helper.py')
-			if BOX_NAME and not os.path.exists(etc_path + '/.box_type'):
-				box_name = BOX_NAME
+				os.system('rm -f ' + sbin_path + '/open_multiboot')
+				os.system('rm -f ' + sbin_path + '/init')
+				os.system('ln -sf /sbin/init.sysvinit ' + sbin_path + '/init')
+#			if os.path.isfile(sbin_path + '/open-multiboot-branding-helper.py'):
+#				os.system('rm -f ' + sbin_path + '/open-multiboot-branding-helper.py')
+			if BOX_NAME:
+				box_n = BOX_NAME
 				if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-					box_name = "vu" + BOX_NAME
-				os.system("echo %s > %s/.box_type" % (box_name, etc_path))
-			if BOX_MODEL and not os.path.exists(etc_path + '/.brand_oem'):
-				os.system("echo %s > %s/.brand_oem" % (BOX_MODEL, etc_path))
-			os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + sbin_path + '/open-multiboot-branding-helper.py')
+					box_n = "vu" + BOX_NAME
+				f = open(etc_path + '/.box_type', "w")
+				f.write(box_n)
+				f.close()
+			if BOX_MODEL:
+				f = open(etc_path + '/.brand_oem', "w")
+				f.write(BOX_MODEL)
+				f.close()
+#			os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + sbin_path + '/open-multiboot-branding-helper.py')
 			if self.checkflashImage():
-				if not os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
-					if self.isCompatible(base_path):
-						os.system("cp " + base_path + "/usr/lib/enigma2/python/boxbranding.so " "/usr/lib/enigma2/python/boxbranding.so")
+#				if not os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
+#					if self.isCompatible(base_path):
+#						os.system("cp " + base_path + "/usr/lib/enigma2/python/boxbranding.so " "/usr/lib/enigma2/python/boxbranding.so")
 				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
 					if self.isCompatible(base_path):
 						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
+						os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/python2.7/boxbranding.so")
 
 	def isCompatible(self, base_path):
 		if os.path.exists("/etc/.box_type"):

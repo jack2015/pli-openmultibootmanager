@@ -146,11 +146,11 @@ except ImportError:
 		BRANDING = False
 
 if BOX_NAME:
-	box_name = BOX_NAME
-	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
- 		box_name = "vu" + BOX_NAME
+#	box_name = BOX_NAME
+#	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
+# 		box_name = "vu" + BOX_NAME
 	f = open('/etc/.box_type', "w")
-	f.write(box_name)
+	f.write(BOX_NAME)
 	f.close()
 	if BOX_NAME[0:2] == "dm":
 		BOX_MODEL = "dreambox"
@@ -860,7 +860,7 @@ class OMBManagerInstall(Screen):
 		if os.path.isfile(dst_path + '/sbin/open_multiboot'):
 			os.system("rm -f " + dst_path + '/sbin/open_multiboot')
 			os.system("rm -f " + dst_path + '/sbin/init')
-			os.system('ln -s ' + dst_path + '/sbin/init.sysvinit ' + dst_path + '/sbin/init')
+			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/init')
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')

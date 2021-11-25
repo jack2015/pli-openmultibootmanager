@@ -347,11 +347,11 @@ class OMBManagerList(Screen):
 #			if os.path.isfile(sbin_path + '/open-multiboot-branding-helper.py'):
 #				os.system('rm -f ' + sbin_path + '/open-multiboot-branding-helper.py')
 			if BOX_NAME:
-				box_n = BOX_NAME
-				if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-					box_n = "vu" + BOX_NAME
+#				box_n = BOX_NAME
+#				if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
+#					box_n = "vu" + BOX_NAME
 				f = open(etc_path + '/.box_type', "w")
-				f.write(box_n)
+				f.write(BOX_NAME)
 				f.close()
 			if BOX_MODEL:
 				f = open(etc_path + '/.brand_oem', "w")

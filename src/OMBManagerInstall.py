@@ -133,7 +133,6 @@ try:
 	from boxbranding import *
 	BRANDING = True
 	BOX_NAME = getBoxType()
-	BOX_MODEL = getBrandOEM()
 except ImportError:
 	try:
 		if BOX_MODEL:
@@ -153,6 +152,9 @@ if BOX_NAME:
 	f = open('/etc/.box_type', "w")
 	f.write(box_name)
 	f.close()
+	if BOX_NAME[0:2] == "dm":
+		BOX_MODEL = "dreambox"
+
 if BOX_MODEL:
 	f = open('/etc/.brand_oem', "w")
 	f.write(BOX_MODEL)

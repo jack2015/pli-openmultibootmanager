@@ -18,6 +18,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
+#   This is for openatv 
+#
 #############################################################################
 
 from Screens.Screen import Screen
@@ -49,7 +51,7 @@ except:
 	screenWidth = 720
 
 try:
-	from boxbranding import getBoxType, getBrandOEM, getImageDistro, getImageVersion, getImageFileSystem, getImageFolder, getMachineKernelFile, getMachineRootFile
+	from boxbranding import getBoxType, getImageDistro, getImageVersion, getImageFileSystem, getImageFolder, getMachineKernelFile, getMachineRootFile
 	BRANDING = True
 except:
 	BRANDING = False
@@ -57,14 +59,23 @@ except:
 if BRANDING:
 	BOX_NAME = getBoxType()
 	OMB_GETBOXTYPE = getBoxType()
-	BOX_MODEL = getBrandOEM()
-	OMB_GETBRANDOEM = getBrandOEM()
 	OMB_GETIMAGEDISTRO = getImageDistro()
 	OMB_GETIMAGEVERSION = getImageVersion()
 	OMB_GETIMAGEFILESYSTEM = getImageFileSystem() # needed
 	OMB_GETIMAGEFOLDER = getImageFolder() # needed
 	OMB_GETMACHINEKERNELFILE = getMachineKernelFile() # needed
 	OMB_GETMACHINEROOTFILE = getMachineRootFile() # needed
+	try:
+		from boxbranding import getBrandOEM
+		BOX_MODEL = getBrandOEM()
+		OMB_GETBRANDOEM = getBrandOEM()
+	except:
+		try:
+			from boxbranding import getBoxBrand
+			BOX_MODEL = getBoxBrand()
+			OMB_GETBRANDOEM = getBoxBrand()
+		except:
+			pass
 else:
 	OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 	f = open("/proc/mounts", "r")
@@ -79,17 +90,14 @@ else:
 
 	if os.path.exists('/etc/hostname'):
 		f = open("/etc/hostname", "r")
-		BOX_NAME = f.read().lower().strip()
+		BOX_NAME = f.read().strip()
 		f.close()
 		if BOX_NAME[0:2] == "dm":
 			BOX_MODEL = "dreambox"
 
 if BOX_NAME:
-	box_name = BOX_NAME
-	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
- 		box_name = "vu" + BOX_NAME
 	f = open('/etc/.box_type', "w")
-	f.write(box_name)
+	f.write(BOX_NAME)
 	f.close()
 if BOX_MODEL:
 	f = open('/etc/.brand_oem', "w")
@@ -460,8 +468,6 @@ class OMBManagerInstall(Screen):
 		else:
 			os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-			self.messagebox.close()
-			self.close(target_folder)
 
 	def installImage(self, src_path, dst_path, kernel_dst_path, tmp_folder):
 		if "ubi" in OMB_GETIMAGEFILESYSTEM:
@@ -688,21 +694,24 @@ class OMBManagerInstall(Screen):
 		else:
 			return False
 		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
+			os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
 		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
-			os.system("cp /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
-#		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-#			os.system("cp /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
-#			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')
+			os.system("cp -f /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
+		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
+			os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
+			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')
+		if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
+			os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/enigma2/python/boxbranding.so")
+			os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
 		if not os.path.exists(dst_path + "/usr/lib/python2.7/subprocess.pyo") and os.path.exists("/usr/lib/python2.7/subprocess.pyo"):
-			os.system("cp /usr/lib/python2.7/subprocess.pyo " + dst_path + "/usr/lib/python2.7/subprocess.pyo")
+			os.system("cp -f /usr/lib/python2.7/subprocess.pyo " + dst_path + "/usr/lib/python2.7/subprocess.pyo")
 		if os.path.isfile(dst_path + '/sbin/open_multiboot'):
 			os.system("rm -f " + dst_path + '/sbin/open_multiboot')
 			os.system("rm -f " + dst_path + '/sbin/init')
-			os.system('ln -s ' + dst_path + '/sbin/init.sysvinit ' + dst_path + '/sbin/init')
+			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/init')
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
-		os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
+		os.system('cp -f /sbin/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		fix = False
 		error = False
 		file = dst_path + '/etc/init.d/volatile-media.sh'

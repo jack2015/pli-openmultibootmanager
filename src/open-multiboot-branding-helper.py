@@ -26,7 +26,6 @@ KEYS_FNC_MAP = {
 	'machine_kernel_file': 'boxbranding.getMachineKernelFile()',
 	'machine_root_file': 'boxbranding.getMachineRootFile()',
 	'box_type': 'boxbranding.getBoxType()',
-	'brand_oem': 'boxbranding.getBrandOEM()',
 	'image_version': 'boxbranding.getImageVersion()',
 	'image_distro': 'boxbranding.getImageDistro()',
 	'image_folder': 'boxbranding.getImageFolder()',

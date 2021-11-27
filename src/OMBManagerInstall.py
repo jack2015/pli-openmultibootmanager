@@ -45,13 +45,8 @@ try:
 except:
 	screenWidth = 720
 
-try:
-	device_name = HardwareInfo().get_device_name()
-except:
-	device_name = None
-
-BOX_MODEL = ""
 BOX_NAME = ""
+BOX_MODEL = ""
 if fileExists("/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/boxtype") and not fileExists("/proc/stb/info/gbmodel"):
 	try:
 		l = open("/proc/stb/info/vumodel")
@@ -127,59 +122,68 @@ elif fileExists("/proc/stb/info/gbmodel") and not fileExists("/proc/stb/info/hwm
 	except:
 		pass
 
-WORKAROUND = False
-box = ''
 try:
-	from boxbranding import *
+	from boxbranding import getBoxType, getImageDistro, getImageVersion, getImageFileSystem, getImageFolder, getMachineKernelFile, getMachineRootFile, getMachineBuild
 	BRANDING = True
+except:
+	BRANDING = False
+
+if BRANDING:
 	BOX_NAME = getBoxType()
-except ImportError:
+	OMB_GETBOXTYPE = getBoxType()
+	OMB_GETIMAGEDISTRO = getImageDistro()
+	OMB_GETIMAGEVERSION = getImageVersion()
+	OMB_GETIMAGEFILESYSTEM = getImageFileSystem()
+	OMB_GETIMAGEFOLDER = getImageFolder()
+	OMB_GETMACHINEKERNELFILE = getMachineKernelFile()
+	OMB_GETMACHINEROOTFILE = getMachineRootFile()
+	OMB_GETMACHINEBUILD = getMachineBuild()
+
+	if 'emmc' in OMB_GETIMAGEFILESYSTEM:
+		if BOX_NAME in ("hd51", "vs1500", "e4hd", "lunix3-4k"):
+			OMB_GETMACHINEKERNELFILE = "kernel1.bin"
+			if BOX_NAME == "lunix3-4k":
+				OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+
+
 	try:
-		if BOX_MODEL:
-			from enigma import getBoxType
-			box = getBoxType()
-			BRANDING = True
-			WORKAROUND = True
-		else:
-			BRANDING = False
+		from boxbranding import getBrandOEM
+		BOX_MODEL = getBrandOEM()
+		OMB_GETBRANDOEM = getBrandOEM()
 	except:
-		BRANDING = False
+		try:
+			from boxbranding import getBoxBrand
+			BOX_MODEL = getBoxBrand()
+			OMB_GETBRANDOEM = getBoxBrand()
+		except:
+			pass
+else:
+	try:
+		from enigma import getBoxType
+		BOX_NAME = getBoxType()
+		if BOX_NAME[0:2] == "dm":
+			BOX_MODEL = "dreambox"
+	except:
+		if os.path.exists('/etc/hostname'):
+			f = open("/etc/hostname", "r")
+			BOX_NAME = f.read().strip()
+			f.close()
+			if BOX_NAME[0:2] == "dm":
+				BOX_MODEL = "dreambox"
 
 if BOX_NAME:
-#	box_name = BOX_NAME
-#	if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-# 		box_name = "vu" + BOX_NAME
 	f = open('/etc/.box_type', "w")
 	f.write(BOX_NAME)
 	f.close()
-	if BOX_NAME[0:2] == "dm":
-		BOX_MODEL = "dreambox"
 
 if BOX_MODEL:
 	f = open('/etc/.brand_oem', "w")
 	f.write(BOX_MODEL)
 	f.close()
 
-OMB_GETMACHINEBUILD = str(box)
-OMB_GETIMAGEFILESYSTEM = "ubi"
-OMB_GETIMAGEFOLDER = str(box)
-OMB_GETMACHINEKERNELFILE = "kernel.bin"
-OMB_GETMACHINEROOTFILE = "rootfs.bin"
-
-if BRANDING and not WORKAROUND:
-	OMB_GETIMAGEFILESYSTEM = getImageFileSystem()
-	OMB_GETIMAGEFOLDER = getImageFolder()
-	OMB_GETMACHINEKERNELFILE = getMachineKernelFile()
-	OMB_GETMACHINEROOTFILE = getMachineRootFile()
-	OMB_GETMACHINEBUILD = getMachineBuild()
-	if 'emmc' in OMB_GETIMAGEFILESYSTEM:
-		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd" or BOX_NAME == "lunix3-4k":
-			OMB_GETMACHINEKERNELFILE = "kernel1.bin"
-			if BOX_NAME == "lunix3-4k":
-				OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-elif BRANDING and WORKAROUND:
+if BOX_NAME and BOX_MODEL:
 	OMB_GETIMAGEFOLDER = BOX_NAME
 	if BOX_MODEL == "vuplus":
 		OMB_GETIMAGEFOLDER = "vuplus/" + BOX_NAME
@@ -263,24 +267,6 @@ elif BRANDING and WORKAROUND:
 			OMB_GETIMAGEFILESYSTEM = "tar.xz"
 		else:
 			OMB_GETIMAGEFILESYSTEM = ""
-else:
-	f = open("/proc/mounts","r")
-	for line in f:
-		if line.find("rootfs") > -1:
-			if line.find("ubi") > -1:
-				OMB_GETIMAGEFILESYSTEM = "ubi"
-				break
-			if line.find("tar.bz2") > -1:
-				OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-				break
-			if line.find("jffs2") > -1:
-				OMB_GETIMAGEFILESYSTEM = "jffs2"
-				break
-			if line.find("tar.xz") > -1:
-				OMB_GETIMAGEFILESYSTEM = "tar.xz"
-				break
-	f.close()
-
 
 OMB_DD_BIN = '/bin/dd'
 OMB_CP_BIN = '/bin/cp'
@@ -849,21 +835,24 @@ class OMBManagerInstall(Screen):
 		else:
 			return False
 		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("ln -s /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
+			os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
 		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
-			os.system("cp /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
+			os.system("cp -f /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
 		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("cp /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
+			os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
 			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')
+		if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
+			os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/enigma2/python/boxbranding.so")
+			os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
 		if not os.path.exists(dst_path + "/usr/lib/python2.7/subprocess.pyo") and os.path.exists("/usr/lib/python2.7/subprocess.pyo"):
-			os.system("cp /usr/lib/python2.7/subprocess.pyo " + dst_path + "/usr/lib/python2.7/subprocess.pyo")
+			os.system("cp -f /usr/lib/python2.7/subprocess.pyo " + dst_path + "/usr/lib/python2.7/subprocess.pyo")
 		if os.path.isfile(dst_path + '/sbin/open_multiboot'):
 			os.system("rm -f " + dst_path + '/sbin/open_multiboot')
 			os.system("rm -f " + dst_path + '/sbin/init')
 			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/init')
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
-		os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
+		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		fix = False
 		error = False
 		file = dst_path + '/etc/init.d/volatile-media.sh'
@@ -885,10 +874,10 @@ class OMBManagerInstall(Screen):
 						print(line.rstrip())
 		if self.dm900_clone_install and BOX_NAME == "dm900":
 			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.14-1.17-dm900/extra')
-			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+			os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (self.dream_path, dst_path))
 		elif self.dm800se_clone_install and BOX_NAME == "dm800se":
 			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.2-dm800se/extra')
-			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+			os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (self.dream_path, dst_path))
 		return True
 
 	def afterLoadpatchInstalldm900(self):

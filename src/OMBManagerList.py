@@ -344,12 +344,7 @@ class OMBManagerList(Screen):
 				os.system('rm -f ' + sbin_path + '/open_multiboot')
 				os.system('rm -f ' + sbin_path + '/init')
 				os.system('ln -sf /sbin/init.sysvinit ' + sbin_path + '/init')
-#			if os.path.isfile(sbin_path + '/open-multiboot-branding-helper.py'):
-#				os.system('rm -f ' + sbin_path + '/open-multiboot-branding-helper.py')
 			if BOX_NAME:
-#				box_n = BOX_NAME
-#				if BOX_MODEL == "vuplus" and BOX_NAME and BOX_NAME[0:2] != "vu":
-#					box_n = "vu" + BOX_NAME
 				f = open(etc_path + '/.box_type', "w")
 				f.write(BOX_NAME)
 				f.close()
@@ -357,14 +352,10 @@ class OMBManagerList(Screen):
 				f = open(etc_path + '/.brand_oem', "w")
 				f.write(BOX_MODEL)
 				f.close()
-#			os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + sbin_path + '/open-multiboot-branding-helper.py')
 			if self.checkflashImage():
-#				if not os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
-#					if self.isCompatible(base_path):
-#						os.system("cp " + base_path + "/usr/lib/enigma2/python/boxbranding.so " "/usr/lib/enigma2/python/boxbranding.so")
 				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
 					if self.isCompatible(base_path):
-						os.system("cp /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
+						os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
 						os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/python2.7/boxbranding.so")
 
 	def isCompatible(self, base_path):
@@ -545,22 +536,22 @@ class OMBManagerList(Screen):
 						os.system(cmd)
 						self.refresh()
 				elif choice[1] == "disable":
-					os.system('rm /sbin/init')
-					os.system('ln -s /sbin/init.sysvinit /sbin/init')
-					os.system('rm -rf /sbin/open-multiboot-branding-helper.py')
+					os.system('rm -f /sbin/init')
+					os.system('ln -sf /sbin/init.sysvinit /sbin/init')
+					os.system('rm -f /sbin/open-multiboot-branding-helper.py')
 					file_entry = self.data_dir + '/.nextboot'
 					file_entry1 = self.data_dir + '/.selected'
-					os.system('rm ' + file_entry)
-					os.system('rm ' + file_entry1)
+					os.system('rm -f ' + file_entry)
+					os.system('rm -f ' + file_entry1)
 					self.refresh()
 				elif choice[1] == "enable":
 					if not self.checkMountFix():
 						self.session.open(MessageBox,_("Fix mount devices (for PLi)") + " !", MessageBox.TYPE_INFO)
 						return
 					if os.path.isfile('/sbin/open_multiboot'):
-						os.system('rm /sbin/init')
-						os.system('ln -sfn /sbin/open_multiboot /sbin/init')
-						os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py /sbin/open-multiboot-branding-helper.py')
+						os.system('rm -f /sbin/init')
+						os.system('ln -sf /sbin/open_multiboot /sbin/init')
+						os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py /sbin/open-multiboot-branding-helper.py')
 						self.refresh()
 				elif choice[1] == "delete":
 					self.session.openWithCallback(self.deleteAnswer, MessageBox, _("Do you want to delete %s?") % (self.data_dir + '/'), MessageBox.TYPE_YESNO)

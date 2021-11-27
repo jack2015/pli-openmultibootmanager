@@ -536,22 +536,22 @@ class OMBManagerList(Screen):
 						os.system(cmd)
 						self.refresh()
 				elif choice[1] == "disable":
-					os.system('rm /sbin/init')
-					os.system('ln -s /sbin/init.sysvinit /sbin/init')
-					os.system('rm -rf /sbin/open-multiboot-branding-helper.py')
+					os.system('rm -f /sbin/init')
+					os.system('ln -sf /sbin/init.sysvinit /sbin/init')
+					os.system('rm -f /sbin/open-multiboot-branding-helper.py')
 					file_entry = self.data_dir + '/.nextboot'
 					file_entry1 = self.data_dir + '/.selected'
-					os.system('rm ' + file_entry)
-					os.system('rm ' + file_entry1)
+					os.system('rm -f ' + file_entry)
+					os.system('rm -f ' + file_entry1)
 					self.refresh()
 				elif choice[1] == "enable":
 					if not self.checkMountFix():
 						self.session.open(MessageBox,_("Fix mount devices (for PLi)") + " !", MessageBox.TYPE_INFO)
 						return
 					if os.path.isfile('/sbin/open_multiboot'):
-						os.system('rm /sbin/init')
-						os.system('ln -sfn /sbin/open_multiboot /sbin/init')
-						os.system('cp /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py /sbin/open-multiboot-branding-helper.py')
+						os.system('rm -f /sbin/init')
+						os.system('ln -sf /sbin/open_multiboot /sbin/init')
+						os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py /sbin/open-multiboot-branding-helper.py')
 						self.refresh()
 				elif choice[1] == "delete":
 					self.session.openWithCallback(self.deleteAnswer, MessageBox, _("Do you want to delete %s?") % (self.data_dir + '/'), MessageBox.TYPE_YESNO)

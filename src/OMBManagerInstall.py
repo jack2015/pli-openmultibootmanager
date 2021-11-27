@@ -42,16 +42,15 @@ import glob
 import struct
 import fileinput
 
-BOX_NAME = ""
-BOX_MODEL = ""
-
 try:
 	screenWidth = getDesktop(0).size().width()
 except:
 	screenWidth = 720
 
+BOX_NAME = ""
+BOX_MODEL = ""
 try:
-	from boxbranding import getBoxType, getImageDistro, getImageVersion, getImageFileSystem, getImageFolder, getMachineKernelFile, getMachineRootFile
+	from boxbranding import getBoxType, getImageDistro, getImageVersion, getImageFileSystem, getImageFolder, getMachineKernelFile, getMachineRootFile, getMachineBuild
 	BRANDING = True
 except:
 	BRANDING = False
@@ -61,10 +60,20 @@ if BRANDING:
 	OMB_GETBOXTYPE = getBoxType()
 	OMB_GETIMAGEDISTRO = getImageDistro()
 	OMB_GETIMAGEVERSION = getImageVersion()
-	OMB_GETIMAGEFILESYSTEM = getImageFileSystem() # needed
-	OMB_GETIMAGEFOLDER = getImageFolder() # needed
-	OMB_GETMACHINEKERNELFILE = getMachineKernelFile() # needed
-	OMB_GETMACHINEROOTFILE = getMachineRootFile() # needed
+	OMB_GETIMAGEFILESYSTEM = getImageFileSystem()
+	OMB_GETIMAGEFOLDER = getImageFolder()
+	OMB_GETMACHINEKERNELFILE = getMachineKernelFile()
+	OMB_GETMACHINEROOTFILE = getMachineRootFile()
+	OMB_GETMACHINEBUILD = getMachineBuild()
+
+	if 'emmc' in OMB_GETIMAGEFILESYSTEM:
+		if BOX_NAME in ("hd51", "vs1500", "e4hd", "lunix3-4k"):
+			OMB_GETMACHINEKERNELFILE = "kernel1.bin"
+			if BOX_NAME == "lunix3-4k":
+				OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+
 	try:
 		from boxbranding import getBrandOEM
 		BOX_MODEL = getBrandOEM()
@@ -77,52 +86,113 @@ if BRANDING:
 		except:
 			pass
 else:
-	OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-	f = open("/proc/mounts", "r")
-	for line in f:
-		if line.find("rootfs") > -1:
-			if line.find("ubi") > -1:
-				OMB_GETIMAGEFILESYSTEM = "ubi"
-				break
-			if line.find("jffs2") > -1:
-				OMB_GETIMAGEFILESYSTEM = "jffs2"
-				break
-
-	if os.path.exists('/etc/hostname'):
-		f = open("/etc/hostname", "r")
-		BOX_NAME = f.read().strip()
-		f.close()
+	try:
+		from enigma import getBoxType
+		BOX_NAME = getBoxType()
 		if BOX_NAME[0:2] == "dm":
 			BOX_MODEL = "dreambox"
+	except:
+		if os.path.exists('/etc/hostname'):
+			f = open("/etc/hostname", "r")
+			BOX_NAME = f.read().strip()
+			f.close()
+			if BOX_NAME[0:2] == "dm":
+				BOX_MODEL = "dreambox"
 
 if BOX_NAME:
 	f = open('/etc/.box_type', "w")
 	f.write(BOX_NAME)
 	f.close()
+
 if BOX_MODEL:
 	f = open('/etc/.brand_oem', "w")
 	f.write(BOX_MODEL)
 	f.close()
 
-if BOX_MODEL == "dreambox":
-	if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
-		OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
-	elif BOX_NAME in ("dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
-		OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
-	elif BOX_NAME == "dm900":
+if BOX_NAME and BOX_MODEL:
+	OMB_GETIMAGEFOLDER = BOX_NAME
+	if BOX_MODEL == "vuplus":
+		OMB_GETIMAGEFOLDER = "vuplus/" + BOX_NAME
+		OMB_GETMACHINEKERNELFILE = "kernel_cfe_auto.bin"
+		if BOX_NAME == "solo2" or BOX_NAME == "duo2" or BOX_NAME == "solose" or BOX_NAME == "zero":
+			OMB_GETMACHINEROOTFILE = "root_cfe_auto.bin"
+		elif BOX_NAME in ("solo4k", "uno4k", "uno4kse", "ultimo4k", "zero4k", "duo4k", "duo4kse"):
+			OMB_GETMACHINEKERNELFILE = "kernel_auto.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+		else:
+			OMB_GETMACHINEROOTFILE = "root_cfe_auto.jffs2"
+	elif BOX_MODEL == "xsarius":
+		OMB_GETIMAGEFOLDER = "update/" + BOX_NAME + "/cfe"
+		OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
+		OMB_GETMACHINEROOTFILE = "oe_rootfs.bin"
+	elif BOX_MODEL == "entwopia":
+		OMB_GETIMAGEFOLDER = BOX_NAME
+		OMB_GETMACHINEKERNELFILE = "kernel.bin"
+		OMB_GETMACHINEROOTFILE = "rootfs.bin"
+	elif BOX_NAME == "lunix3-4k" or BOX_NAME == "lunix4k":
+		OMB_GETIMAGEFOLDER = "update/" + BOX_NAME
+		OMB_GETMACHINEKERNELFILE = "oe_kernel.bin"
+		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+	elif BOX_NAME == "gbquad4k" or BOX_NAME == "gbue4k":
+		OMB_GETIMAGEFOLDER = "gigablue/" + (BOX_NAME == "gbue4k" and "ue4k" or "quad4k")
 		OMB_GETMACHINEKERNELFILE = "kernel.bin"
 		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-		OMB_GETIMAGEFOLDER = "dm900"
-	elif BOX_NAME == "dm920":
-		OMB_GETMACHINEKERNELFILE = "kernel.bin"
-		OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-		OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-		OMB_GETIMAGEFOLDER = "dm920"
-	elif BOX_NAME in ("dm520", "dm525", "dm820", "dm7080"):
-		OMB_GETIMAGEFILESYSTEM = "tar.xz"
-	else:
-		OMB_GETIMAGEFILESYSTEM = ""
+	elif BOX_MODEL == "xtrend":
+		if BOX_NAME.startswith("et7"):
+			OMB_GETIMAGEFOLDER = "et7x00"
+		elif BOX_NAME.startswith("et9"):
+			OMB_GETIMAGEFOLDER = "et9x00"
+		elif BOX_NAME.startswith("et5"):
+			OMB_GETIMAGEFOLDER = "et5x00"
+		elif BOX_NAME.startswith("et6"):
+			OMB_GETIMAGEFOLDER = "et6x00"
+		elif BOX_NAME.startswith("et11"):
+			OMB_GETIMAGEFOLDER = "et1x000"
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+		elif BOX_NAME.startswith("et13"):
+			OMB_GETIMAGEFOLDER = "et13000"
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+		if BOX_NAME.startswith('g300'):
+			OMB_GETIMAGEFOLDER = "miraclebox/" + 'twinplus'
+		elif BOX_NAME.startswith('7000S'):
+			OMB_GETIMAGEFOLDER = "miraclebox/" + 'micro'
+	elif BOX_MODEL == "gfutures":
+		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd":
+			OMB_GETMACHINEKERNELFILE = "kernel1.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+	elif BOX_MODEL == "airdigital":
+		OMB_GETIMAGEFOLDER = "zgemma/" + BOX_NAME
+		if BOX_NAME == "h7":
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+	elif BOX_MODEL == "dreambox":
+		if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
+			OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
+		elif BOX_NAME in ("dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
+			OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
+		elif BOX_NAME == "dm900":
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+			OMB_GETIMAGEFOLDER = "dm900"
+		elif BOX_NAME == "dm920":
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+			OMB_GETIMAGEFOLDER = "dm920"
+		elif BOX_NAME in ("dm520", "dm525", "dm820", "dm7080"):
+			OMB_GETIMAGEFILESYSTEM = "tar.xz"
+		else:
+			OMB_GETIMAGEFILESYSTEM = ""
 
 OMB_DD_BIN = '/bin/dd'
 OMB_CP_BIN = '/bin/cp'
@@ -711,7 +781,7 @@ class OMBManagerInstall(Screen):
 			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/init')
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
-		os.system('cp -f /sbin/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
+		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		fix = False
 		error = False
 		file = dst_path + '/etc/init.d/volatile-media.sh'
@@ -733,10 +803,10 @@ class OMBManagerInstall(Screen):
 						print(line.rstrip())
 		if self.dm900_clone_install and BOX_NAME == "dm900":
 			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.14-1.17-dm900/extra')
-			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+			os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (self.dream_path, dst_path))
 		elif self.dm800se_clone_install and BOX_NAME == "dm800se":
 			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.2-dm800se/extra')
-			os.system(OMB_TAR_BIN + ' xpJf %s -C %s' % (self.dream_path, dst_path))
+			os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (self.dream_path, dst_path))
 		return True
 
 	def afterLoadpatchInstalldm900(self):

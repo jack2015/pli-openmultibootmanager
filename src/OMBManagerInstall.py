@@ -763,22 +763,37 @@ class OMBManagerInstall(Screen):
 				return False
 		else:
 			return False
-		if not os.path.exists('/usr/lib/python2.7/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python2.7/boxbranding.so")
+
+		for pyver in [ "2.7", "3.8", "3.9"]:
+			if os.path.exists('/usr/lib/python' + pyver):
+				if not os.path.exists('/usr/lib/python' + pyver +'/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
+					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python' + pyver +'/boxbranding.so')
+				if os.path.exists(dst_path + '/usr/lib/python' + pyver +'/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
+					os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
+					os.system('rm -f ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.py')
+				if not os.path.exists(dst_path + '/usr/lib/python' + pyver +'/subprocess.pyo') and os.path.exists('/usr/lib/python' + pyver +'/subprocess.pyo'):
+					os.system('cp -f /usr/lib/python' + pyver +'/subprocess.pyo ' + dst_path + '/usr/lib/python' + pyver +'/subprocess.pyo')
+				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
+					os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/enigma2/python/boxbranding.so')
+					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
+				break
+
+		if BOX_NAME:
+			f = open(dst_path + '/etc/.box_type', "w")
+			f.write(BOX_NAME)
+			f.close()
+		if BOX_MODEL:
+			f = open(dst_path + '/etc/.brand_oem', "w")
+			f.write(BOX_MODEL)
+			f.close()
+
 		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
 			os.system("cp -f /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
-		if os.path.exists(dst_path + '/usr/lib/python2.7/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
-			os.system("rm -f " + dst_path + '/usr/lib/python2.7/boxbranding.py')
-		if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
-			os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/enigma2/python/boxbranding.so")
-			os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so " + dst_path + "/usr/lib/python2.7/boxbranding.so")
-		if not os.path.exists(dst_path + "/usr/lib/python2.7/subprocess.pyo") and os.path.exists("/usr/lib/python2.7/subprocess.pyo"):
-			os.system("cp -f /usr/lib/python2.7/subprocess.pyo " + dst_path + "/usr/lib/python2.7/subprocess.pyo")
 		if os.path.isfile(dst_path + '/sbin/open_multiboot'):
 			os.system("rm -f " + dst_path + '/sbin/open_multiboot')
 			os.system("rm -f " + dst_path + '/sbin/init')
 			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/init')
+			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/open_multiboot')
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')

@@ -336,27 +336,16 @@ class OMBManagerList(Screen):
 			return
 		self.session.open(OMBManagerAbout)
 
+
 	def checkBackupVerification(self, base_path):
 		sbin_path = base_path + '/sbin'
 		if os.path.exists(sbin_path):
 			etc_path = base_path + '/etc'
 			if os.path.isfile(sbin_path + '/open_multiboot'):
-				os.system('rm -rf ' + sbin_path + '/open_multiboot')
-				os.system('rm -rf ' + sbin_path + '/init')
+				os.system('rm -f ' + sbin_path + '/open_multiboot')
+				os.system('rm -f ' + sbin_path + '/init')
 				os.system('ln -sf /sbin/init.sysvinit ' + sbin_path + '/init')
-			if BOX_NAME:
-				f = open(etc_path + '/.box_type', "w")
-				f.write(BOX_NAME)
-				f.close()
-			if BOX_MODEL:
-				f = open(etc_path + '/.brand_oem', "w")
-				f.write(BOX_MODEL)
-				f.close()
-			if self.checkflashImage():
-				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(base_path + '/usr/lib/enigma2/python/boxbranding.so'):
-					if self.isCompatible(base_path):
-						os.system("cp -f /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/enigma2/python/boxbranding.so")
-						os.system("ln -sf /usr/lib/enigma2/python/boxbranding.so " + base_path + "/usr/lib/python2.7/boxbranding.so")
+				os.system('ln -sf /sbin/init.sysvinit ' + sbin_path + '/open_multiboot')
 
 	def isCompatible(self, base_path):
 		if os.path.exists("/etc/.box_type"):

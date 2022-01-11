@@ -868,6 +868,7 @@ class OMBManagerInstall(Screen):
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
+		os.system("sed -i -e '/mtdblock2/d' " + dst_path + "/etc/fstab")
 		fix = False
 		error = False
 		file = dst_path + '/etc/init.d/volatile-media.sh'

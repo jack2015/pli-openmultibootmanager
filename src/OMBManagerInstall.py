@@ -845,7 +845,7 @@ class OMBManagerInstall(Screen):
 		else:
 			return False
 
-		for pyver in [ "2.7", "3.8", "3.9"]:
+		for pyver in [ "2.7", "3.8", "3.9", "3.10"]:
 			if os.path.exists('/usr/lib/python' + pyver):
 				if not os.path.exists('/usr/lib/python' + pyver +'/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python' + pyver +'/boxbranding.so')

@@ -99,14 +99,24 @@ else:
 			if BOX_NAME[0:2] == "dm":
 				BOX_MODEL = "dreambox"
 
-if BOX_NAME:
-	f = open('/etc/.box_type', "w")
-	f.write(BOX_NAME)
+if not fileExists('/etc/.box_type'):
+	if BOX_NAME:
+		f = open('/etc/.box_type', "w")
+		f.write(BOX_NAME)
+		f.close()
+else:
+	f = open('/etc/.box_type', "r")
+	BOX_NAME = f.read().strip()
 	f.close()
 
-if BOX_MODEL:
-	f = open('/etc/.brand_oem', "w")
-	f.write(BOX_MODEL)
+if not fileExists('/etc/.brand_oem'):
+	if BOX_MODEL:
+		f = open('/etc/.brand_oem', "w")
+		f.write(BOX_MODEL)
+		f.close()
+else:
+	f = open('/etc/.brand_oem', "r")
+	BOX_MODEL = f.read().strip()
 	f.close()
 
 if BOX_NAME and BOX_MODEL:
@@ -764,7 +774,7 @@ class OMBManagerInstall(Screen):
 		else:
 			return False
 
-		for pyver in [ "2.7", "3.8", "3.9"]:
+		for pyver in [ "2.7", "3.8", "3.9", "3.10"]:
 			if os.path.exists('/usr/lib/python' + pyver):
 				if not os.path.exists('/usr/lib/python' + pyver +'/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python' + pyver +'/boxbranding.so')
@@ -797,6 +807,7 @@ class OMBManagerInstall(Screen):
 		if os.path.isfile(dst_path + '/sbin/open-multiboot-branding-helper.py'):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
+		os.system("sed -i -e '/mtdblock2/d' " + dst_path + "/etc/fstab")
 		fix = False
 		error = False
 		file = dst_path + '/etc/init.d/volatile-media.sh'

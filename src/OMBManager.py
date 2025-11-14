@@ -41,7 +41,10 @@ class OMBManagerInit:
 		disks_list = []
 		for p in harddiskmanager.getMountedPartitions():
 			if p and os.path.exists(p.mountpoint) and os.access(p.mountpoint, os.F_OK|os.R_OK) and p.device and p.mountpoint != '/' and (p.device[:2] == 'sd' or (p.device.startswith('mmcblk0p') and BOX_NAME not in ('sf8008', 'sf5008', 'et13000', 'et11000','et1x000', 'duo4k', 'duo4kse', 'uno4k', 'uno4kse', 'ultimo4k', 'solo4k', 'zero4k', 'hd51', 'hd52', 'dm820', 'dm7080', 'sf4008', 'dm900', 'dm920', 'gbquad4k', 'gbue4k', 'lunix3-4k', 'lunix-4k', 'vs1500', 'h7', '8100s', 'e4hd', 'gbmv200', 'multibox', 'h8', 'h9', 'h9combo', 'h9twin', 'h10', 'v8plus', 'hd60', 'hd61'))) and isMounted(p.mountpoint):
-				disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+				try:
+					disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+				except:
+					pass
 
 		if len(disks_list) > 0:
 			disks_list.append((_("Cancel"), None))

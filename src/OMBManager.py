@@ -43,15 +43,16 @@ class OMBManagerInit:
 			if p.mountpoint != '/':
 				if p.description is not None:
 					if p.mountpoint == '/media/mmc':
-						p.device = 'mmcblk1p1'
-						if isMounted('/media/mmcblk1p1'):
-							p.mountpoint = '/media/mmcblk1p1'
-						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+						if isMounted('/media/mmc'):
+							p.device = 'mmcblk1p1'
+							disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+						else:
+							disks_list.append((_('Find unknown device. Please reboot machine'), None))
 					else:
 						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
 				else:
 					disks_list.append((_('Find unknown device. Please reboot machine'), None))
-
+		
 		if disks_list is not None:
 			disks_list.append((_("Cancel"), None))
 			self.session.openWithCallback(self.initCallback, MessageBox, message, list=disks_list)
@@ -240,8 +241,6 @@ def OMBManager(session, **kwargs):
 			if p.mountpoint != '/':
 				if p.mountpoint == '/media/mmc':
 					p.device = 'mmcblk1p1'
-					if isMounted('/media/mmcblk1p1'):
-						p.mountpoint = '/media/mmcblk1p1'
 				data_dir = p.mountpoint + '/' + OMB_DATA_DIR
 				if os.path.exists(data_dir) and os.access(p.mountpoint, os.F_OK|os.R_OK) and isMounted(p.mountpoint):
 					session.open(OMBManagerList, p.mountpoint)

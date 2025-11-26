@@ -40,13 +40,18 @@ class OMBManagerInit:
 		message = _("Where do you want to install openMultiboot?")
 		disks_list = []
 		for p in harddiskmanager.getMountedPartitions():
-			if p and os.path.exists(p.mountpoint) and os.access(p.mountpoint, os.F_OK | os.R_OK) and p.device and p.mountpoint != '/' and (p.device[:2] == 'sd' or (p.device.startswith('mmcblk1p') and BOX_NAME not in ('xc7439', 'osmio4k', 'osmio4kplus', 'osmini4k')) or (p.device.startswith('mmcblk0p') and BOX_NAME not in ('sf8008', 'sf5008', 'sf8008m', 'et13000', 'et11000', 'et1x000', 'duo4k', 'duo4kse', 'uno4k', 'uno4kse', 'ultimo4k', 'solo4k', 'zero4k', 'hd51', 'hd52', 'dm820', 'dm7080', 'sf4008', 'dm900', 'dm920', 'gbquad4k', 'gbue4k', 'lunix3-4k', 'lunix-4k', 'vs1500', 'h7', '8100s', 'e4hd', 'gbmv200', 'multibox', 'multiboxse', 'h9se', 'h11', 'h9combo', 'h9combose', 'h9twin', 'h9twinse', 'h10', 'v8plus', 'hd60', 'hd61','hd66se' , 'pulse4k', 'pulse4kmini', 'dual'))) and isMounted(p.mountpoint):
-				try:
-					disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
-				except:
-					pass
+			if p.mountpoint != '/':
+				if p.description is not None:
+					if p.mountpoint == '/media/mmc':
+						p.device = 'mmcblk1p1'
+						p.mountpoint = '/media/mmcblk1p1'
+						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+					else:
+						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+				else:
+					disks_list.append((_('Find unknown device. Please reboot machine'), None))
 
-		if len(disks_list) > 0:
+		if disks_list is not None:
 			disks_list.append((_("Cancel"), None))
 			self.session.openWithCallback(self.initCallback, MessageBox, message, list=disks_list)
 		else:
@@ -75,7 +80,7 @@ class OMBManagerInit:
 			if not os.path.exists(upload_dir):
 				os.makedirs(upload_dir)
 		except OSError as exception:
-			self.session.open(MessageBox, _("Cannot create data folder"), type = MessageBox.TYPE_ERROR)
+			self.session.open(MessageBox, _("Cannot create data folder Please reboot machine"), type = MessageBox.TYPE_ERROR)
 			return
 
 		self.session.open(OMBManagerList, partition.mountpoint)
@@ -231,7 +236,10 @@ def OMBManager(session, **kwargs):
 		found = True
 	else:
 		for p in harddiskmanager.getMountedPartitions():
-			if p and p.device and p.mountpoint != '/' and (p.device[:2] == 'sd' or (p.device.startswith('mmcblk0p') and BOX_NAME not in ('5008', 'et13000', 'et11000',' et1x000', 'uno4k', 'uno4kse', 'ultimo4k', 'solo4k', 'zero4k', 'hd51', 'hd52', 'dm820', 'dm7080', 'sf4008', 'dm900', 'dm920', 'gb7252', 'lunix3-4k', 'vs1500', 'h7', '8100s'))):
+			if p.mountpoint != '/':
+				if p.mountpoint == '/media/mmc':
+					p.mountpoint = '/media/mmcblk1p1'
+					p.device = 'mmcblk1p1'
 				data_dir = p.mountpoint + '/' + OMB_DATA_DIR
 				if os.path.exists(data_dir) and os.access(p.mountpoint, os.F_OK|os.R_OK) and isMounted(p.mountpoint):
 					session.open(OMBManagerList, p.mountpoint)

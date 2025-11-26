@@ -52,7 +52,7 @@ class OMBManagerInit:
 						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
 				else:
 					disks_list.append((_('Find unknown device. Please reboot machine'), None))
-		
+
 		if disks_list is not None:
 			disks_list.append((_("Cancel"), None))
 			self.session.openWithCallback(self.initCallback, MessageBox, message, list=disks_list)

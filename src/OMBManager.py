@@ -44,7 +44,8 @@ class OMBManagerInit:
 				if p.description is not None:
 					if p.mountpoint == '/media/mmc':
 						p.device = 'mmcblk1p1'
-						p.mountpoint = '/media/mmcblk1p1'
+						if isMounted('/media/mmcblk1p1'):
+							p.mountpoint = '/media/mmcblk1p1'
 						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
 					else:
 						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
@@ -238,8 +239,9 @@ def OMBManager(session, **kwargs):
 		for p in harddiskmanager.getMountedPartitions():
 			if p.mountpoint != '/':
 				if p.mountpoint == '/media/mmc':
-					p.mountpoint = '/media/mmcblk1p1'
 					p.device = 'mmcblk1p1'
+					if isMounted('/media/mmcblk1p1'):
+						p.mountpoint = '/media/mmcblk1p1'
 				data_dir = p.mountpoint + '/' + OMB_DATA_DIR
 				if os.path.exists(data_dir) and os.access(p.mountpoint, os.F_OK|os.R_OK) and isMounted(p.mountpoint):
 					session.open(OMBManagerList, p.mountpoint)

@@ -39,10 +39,12 @@ class OMBManagerInit:
 
 		message = _("Where do you want to install openMultiboot?")
 		disks_list = []
+		fd1 = False
 		for p in harddiskmanager.getMountedPartitions():
 			if p.mountpoint != '/':
 				if p.description is not None:
 					if p.mountpoint == '/media/mmc':
+						fd1 = True
 						if isMounted('/media/mmc'):
 							p.device = 'mmcblk1p1'
 							disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
@@ -53,6 +55,9 @@ class OMBManagerInit:
 				else:
 					disks_list.append((_('Find unknown device. Please reboot machine'), None))
 
+		if (fd1 == False) and isMounted("/media/mmcblk1p1"):
+			os.system("mount /dev/mmcblk1p1 /media/mmc")
+			
 		if disks_list is not None:
 			disks_list.append((_("Cancel"), None))
 			self.session.openWithCallback(self.initCallback, MessageBox, message, list=disks_list)
@@ -203,6 +208,7 @@ class OMBManagerKernelModule:
 			OMBManager(self.session)
 
 def OMBManager(session, **kwargs):
+
 	found = False
 	omb_image = os.path.ismount('/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot')
 
@@ -252,9 +258,10 @@ def OMBManager(session, **kwargs):
 
 def isMounted(device):
 	try:
-		for line in open("/proc/mounts"):
-			if line.find(device[:-1]) > -1:
+		for line in open("/proc/mounts",'r').readlines():
+			if device in line:
 				return True
+				break
 	except:
 		pass
 	return False

@@ -514,28 +514,7 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 					else:
-						if self.afterInstallImage(target_folder):
-							os.system(OMB_RM_BIN + ' -f ' + source_file)
-						else:
-							self.showError(_("This firmware is not suitable for this machine"))
-							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-							os.system(OMB_RM_BIN + ' -rf ' + target_folder)
-							return
-						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-						self.messagebox.close()
-						self.close(target_folder)
-					return
-				if not self.extractImageNFI(nfifile[0], tmp_folder):
-					self.showError(_("Cannot extract nfi image"))
-					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-				else:
-					if not os.path.exists(target_folder + "/usr/bin/enigma2"):
-						self.showError(_("Cannot extract nfi image"))
-						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-					else:
 						self.afterInstallImage(target_folder)
-						os.system(OMB_RM_BIN + ' -f ' + source_file)
-						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 						self.messagebox.close()
 						self.close(target_folder)
 			else:
@@ -547,22 +526,15 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				if self.afterInstallImage(target_folder):
-					os.system(OMB_RM_BIN + ' -f ' + source_file)
-				else:
-					self.showError(_("This firmware is not suitable for this machine"))
-					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
-					return
-				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-				self.messagebox.close()
-				self.close(target_folder)
+				self.afterInstallImage(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
 				elif BOX_NAME in ("dm820", "dm7080"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+				self.messagebox.close()
+				self.close(target_folder)
 
 		elif targzfile:
 			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -570,22 +542,15 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				if self.afterInstallImage(target_folder):
-					os.system(OMB_RM_BIN + ' -f ' + source_file)
-				else:
-					self.showError(_("This firmware is not suitable for this machine"))
-					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
-					return
-				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-				self.messagebox.close()
-				self.close(target_folder)
+				self.afterInstallImage(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
 				elif BOX_NAME in ("dm820", "dm7080"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+				self.messagebox.close()
+				self.close(target_folder)
 
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -593,22 +558,15 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				if self.afterInstallImage(target_folder):
-					os.system(OMB_RM_BIN + ' -f ' + source_file)
-				else:
-					self.showError(_("This firmware is not suitable for this machine"))
-					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
-					return
-				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-				self.messagebox.close()
-				self.close(target_folder)
+				self.afterInstallImage(target_folder)
 				if BOX_NAME in ("dm900", "dm920"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
 				elif BOX_NAME in ("dm820", "dm7080"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 				elif BOX_NAME in ("dm520", "dm525"):
 					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+				self.messagebox.close()
+				self.close(target_folder)
 
 		elif self.installImage(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 			os.system(OMB_RM_BIN + ' -f ' + source_file)
@@ -834,16 +792,13 @@ class OMBManagerInstall(Screen):
 
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
-		if not os.path.exists(dst_path + "/sbin"):
-			return False
+		CHK_ERROR = True
 		if os.path.exists(dst_path + '/etc/hostname'):
 			f = open(dst_path + '/etc/hostname', "r")
 			b_type = str(f.read().lower().strip())
 			f.close()
 			if BOX_NAME != b_type and BOX_NAME not in b_type:
-				return False
-		else:
-			return False
+				CHK_ERROR = False
 
 		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]:
 			if os.path.exists('/usr/lib/python' + pyver):
@@ -859,11 +814,11 @@ class OMBManagerInstall(Screen):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
 				break
 
-		if BOX_NAME:
+		if BOX_NAME and CHK_ERROR:
 			f = open(dst_path + '/etc/.box_type', "w")
 			f.write(BOX_NAME)
 			f.close()
-		if BOX_MODEL:
+		if BOX_MODEL and CHK_ERROR:
 			f = open(dst_path + '/etc/.brand_oem', "w")
 			f.write(BOX_MODEL)
 			f.close()

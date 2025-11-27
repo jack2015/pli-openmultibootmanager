@@ -792,6 +792,13 @@ class OMBManagerInstall(Screen):
 
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
+		CHK_ERROR = True
+		if os.path.exists(dst_path + '/etc/hostname'):
+			f = open(dst_path + '/etc/hostname', "r")
+			b_type = str(f.read().lower().strip())
+			f.close()
+			if BOX_NAME != b_type and BOX_NAME not in b_type:
+				CHK_ERROR = False
 
 		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]:
 			if os.path.exists('/usr/lib/python' + pyver):
@@ -807,11 +814,11 @@ class OMBManagerInstall(Screen):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
 				break
 
-		if BOX_NAME:
+		if BOX_NAME and CHK_ERROR:
 			f = open(dst_path + '/etc/.box_type', "w")
 			f.write(BOX_NAME)
 			f.close()
-		if BOX_MODEL:
+		if BOX_MODEL and CHK_ERROR:
 			f = open(dst_path + '/etc/.brand_oem', "w")
 			f.write(BOX_MODEL)
 			f.close()

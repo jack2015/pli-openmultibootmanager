@@ -369,8 +369,10 @@ class OMBManagerList(Screen):
 			f = open(archconffile, "r")
 			b_type = str(f.read().lower().strip())
 			f.close()
-		if running == b_type or running in b_type:
-			return True
+			if running == b_type and running in b_type:
+				return True
+			else:
+				return False
 		
 		try:
 			archconffile = "%s/etc/opkg/arch.conf" % base_path

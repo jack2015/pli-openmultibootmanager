@@ -186,6 +186,7 @@ class OMBManagerList(Screen):
 				if file_entry[0] == '.':
 					continue
 				if not self.isCompatible(self.data_dir + '/' + file_entry):
+					os.system('rm -rf ' + self.data_dir + '/' + file_entry)
 					continue
 				if os.path.exists(self.data_dir + '/.label_' + file_entry):
 					title = self.imageTitleFromLabel('.label_' + file_entry)
@@ -347,6 +348,9 @@ class OMBManagerList(Screen):
 				os.system('ln -sf /sbin/init.sysvinit ' + sbin_path + '/open_multiboot')
 
 	def isCompatible(self, base_path):
+		archconffile = "%s/usr/bin/multiboot-selector.sh" % base_path
+		if os.path.exists(archconffile):
+			return False
 		if os.path.exists("/etc/.box_type"):
 			f = open("/etc/.box_type", "r")
 			running = str(f.read().lower().strip())

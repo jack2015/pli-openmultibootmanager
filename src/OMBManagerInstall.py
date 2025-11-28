@@ -273,7 +273,17 @@ if BOX_NAME and BOX_MODEL:
 			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
 			OMB_GETIMAGEFOLDER = "dm920"
-		elif BOX_NAME in ("dm520", "dm525", "dm820", "dm7080"):
+		elif BOX_NAME == "dm7080":
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+			OMB_GETIMAGEFOLDER = "dm7080"
+		elif BOX_NAME == "dm820":
+			OMB_GETMACHINEKERNELFILE = "kernel.bin"
+			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
+			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
+			OMB_GETIMAGEFOLDER = "dm820"
+		elif BOX_NAME in ("dm520", "dm525"):
 			OMB_GETIMAGEFILESYSTEM = "tar.xz"
 		else:
 			OMB_GETIMAGEFILESYSTEM = ""
@@ -503,6 +513,7 @@ class OMBManagerInstall(Screen):
 			CMD_LINE = ""
 			if BOX_MODEL != "dreambox":
 				self.showError(_("Your STB doesn\'t seem supported"))
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				return
 			if BOX_NAME in ("dm800", "dm500hd", "dm800se", "dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
 				if os.path.exists(OMB_NFIDUMP_BIN):
@@ -510,52 +521,70 @@ class OMBManagerInstall(Screen):
 						CMD_LINE = OMB_NFIDUMP_BIN + ' --squashfskeep ' + nfifile[0] + ' ' + target_folder
 					else:
 						CMD_LINE = OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder
-					if os.system(CMD_LINE) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+					if (os.system(CMD_LINE) != 0) or (not os.path.exists(target_folder + "/usr/bin/enigma2")):
 						self.showError(_("Cannot extract nfi image"))
 						os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 					else:
-						self.afterInstallImage(target_folder)
-						self.messagebox.close()
-						self.close(target_folder)
+						if self.afterInstallImage(target_folder):
+							os.system(OMB_RM_BIN + ' -f ' + source_file)
+							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+							self.messagebox.close()
+							self.close(target_folder)
+						else:
+							self.showError(_("Your STB doesn\'t seem supported"))
+							os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				else:
 					self.showError(_("Cannot find nfidump tools"))
-					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.showError(_("Your STB doesn\'t seem supported"))
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
 		elif tarxzfile:
-			if os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (tarxzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+			if (os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (tarxzfile[0], target_folder)) != 0) or (not os.path.exists(target_folder + "/usr/bin/enigma2")):
 				self.showError(_("Error unpacking rootfs"))
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				self.afterInstallImage(target_folder)
-				if BOX_NAME in ("dm900", "dm920"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
-				elif BOX_NAME in ("dm820", "dm7080"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
-				elif BOX_NAME in ("dm520", "dm525"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
-				self.messagebox.close()
-				self.close(target_folder)
+				if self.afterInstallImage(target_folder):
+					if BOX_NAME in ("dm900", "dm920"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+					elif BOX_NAME in ("dm820", "dm7080"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
+					elif BOX_NAME in ("dm520", "dm525"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+					os.system(OMB_RM_BIN + ' -f ' + source_file)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					self.messagebox.close()
+					self.close(target_folder)
+				else:
+					self.showError(_("Your STB doesn\'t seem supported"))
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
 		elif targzfile:
-			if os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
+			if (os.system(OMB_TAR_BIN + ' xzf %s -C %s' % (targzfile[0], target_folder)) != 0) or (not os.path.exists(target_folder + "/usr/bin/enigma2")):
 				self.showError(_("Error unpacking rootfs"))
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				self.afterInstallImage(target_folder)
-				if BOX_NAME in ("dm900", "dm920"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
-				elif BOX_NAME in ("dm820", "dm7080"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
-				elif BOX_NAME in ("dm520", "dm525"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
-				self.messagebox.close()
-				self.close(target_folder)
+				if self.afterInstallImage(target_folder):
+					if BOX_NAME in ("dm900", "dm920"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+					elif BOX_NAME in ("dm820", "dm7080"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
+					elif BOX_NAME in ("dm520", "dm525"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+					os.system(OMB_RM_BIN + ' -f ' + source_file)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					self.messagebox.close()
+					self.close(target_folder)
+				else:
+					self.showError(_("Your STB doesn\'t seem supported"))
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
 		elif tarbz2file:
 			if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (tarbz2file[0], target_folder)) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
@@ -563,252 +592,73 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
-				self.afterInstallImage(target_folder)
-				if BOX_NAME in ("dm900", "dm920"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
-				elif BOX_NAME in ("dm820", "dm7080"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
-				elif BOX_NAME in ("dm520", "dm525"):
-					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+				if self.afterInstallImage(target_folder):
+					if BOX_NAME in ("dm900", "dm920"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+					elif BOX_NAME in ("dm820", "dm7080"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
+					elif BOX_NAME in ("dm520", "dm525"):
+						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
+					os.system(OMB_RM_BIN + ' -f ' + source_file)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					self.messagebox.close()
+					self.close(target_folder)
+				else:
+					self.showError(_("Your STB doesn\'t seem supported"))
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+
+		elif "tar.bz2" in OMB_GETIMAGEFILESYSTEM:
+			if self.installImageTARBZ2(tmp_folder, target_folder, kernel_target_file, tmp_folder):
+				os.system(OMB_RM_BIN + ' -f ' + source_file)
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				self.messagebox.close()
 				self.close(target_folder)
+			else:
+				os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
-		elif self.installImage(tmp_folder, target_folder, kernel_target_file, tmp_folder):
-			os.system(OMB_RM_BIN + ' -f ' + source_file)
-			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-			self.messagebox.close()
-			self.close(target_folder)
-
-		else:
-			os.system(OMB_RM_BIN + ' -rf ' + target_folder)
-			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-
-	def installImage(self, src_path, dst_path, kernel_dst_path, tmp_folder):
-		if "ubi" in OMB_GETIMAGEFILESYSTEM:
-			return self.installImageUBI(src_path, dst_path, kernel_dst_path, tmp_folder)
-		elif "jffs2" in OMB_GETIMAGEFILESYSTEM:
-			return self.installImageJFFS2(src_path, dst_path, kernel_dst_path, tmp_folder)
-		elif "tar.bz2" in OMB_GETIMAGEFILESYSTEM:
-			return self.installImageTARBZ2(src_path, dst_path, kernel_dst_path, tmp_folder)
 		else:
 			self.showError(_("Your STB doesn\'t seem supported"))
-			return False
+			os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
 	def installImageTARBZ2(self, src_path, dst_path, kernel_dst_path, tmp_folder):
 		base_path = src_path + '/' + (self.alt_install and config.plugins.omb.alternative_image_folder.value or OMB_GETIMAGEFOLDER)
 		rootfs_path = base_path + '/' + OMB_GETMACHINEROOTFILE
 		kernel_path = base_path + '/' + OMB_GETMACHINEKERNELFILE
-		if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd":
-			if OMB_GETMACHINEKERNELFILE == "kernel1.bin" and not os.path.exists(kernel_path):
-				kernel_path = base_path + '/' + "kernel.bin"
+
 		if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (rootfs_path,dst_path)) != 0:
 			self.showError(_("Error unpacking rootfs"))
 			return False
-		if os.path.exists(dst_path + '/usr/bin/enigma2'):
-			if os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path) != 0:
-				self.showError(_("Error copying kernel"))
-				return False
-		else:
-			self.showError(_("Error unpacking rootfs"))
-			return False
 		if self.afterInstallImage(dst_path):
-			return True
-		else:
-			return False
-
-	def installImageJFFS2(self, src_path, dst_path, kernel_dst_path, tmp_folder):
-		rc = True
-		mtdfile = "/dev/mtdblock0"
-		for i in range(0, 20):
-			mtdfile = "/dev/mtdblock%d" % i
-			if not os.path.exists(mtdfile):
-				break
-		base_path = src_path + '/' + (self.alt_install and config.plugins.omb.alternative_image_folder.value or OMB_GETIMAGEFOLDER)
-		rootfs_path = base_path + '/' + OMB_GETMACHINEROOTFILE
-		kernel_path = base_path + '/' + OMB_GETMACHINEKERNELFILE
-		jffs2_path = src_path + '/jffs2'
-		if os.path.exists(OMB_UNJFFS2_BIN):
-			if os.system("%s %s %s" % (OMB_UNJFFS2_BIN, rootfs_path, jffs2_path)) != 0:
-				self.showError(_("Error unpacking rootfs"))
-				rc = False
-			if os.path.exists(jffs2_path + '/usr/bin/enigma2'):
-				if os.system(OMB_CP_BIN + ' -rp ' + jffs2_path + '/* ' + dst_path) != 0:
-					self.showError(_("Error copying unpacked rootfs"))
-					rc = False
+			if os.path.exists(dst_path + '/usr/bin/enigma2'):
 				if os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path) != 0:
 					self.showError(_("Error copying kernel"))
-					rc = False
-		else:
-			os.system(OMB_MODPROBE_BIN + ' loop')
-			os.system(OMB_MODPROBE_BIN + ' mtdblock')
-			os.system(OMB_MODPROBE_BIN + ' block2mtd')
-			os.system(OMB_MKNOD_BIN + ' ' + mtdfile + ' b 31 0')
-			os.system(OMB_LOSETUP_BIN + ' /dev/loop0 ' + rootfs_path)
-			os.system(OMB_ECHO_BIN + ' "/dev/loop0,%s" > /sys/module/block2mtd/parameters/block2mtd' % self.esize)
-			os.system(OMB_MOUNT_BIN + ' -t jffs2 ' + mtdfile + ' ' + jffs2_path)
-			if os.path.exists(jffs2_path + '/usr/bin/enigma2'):
-				if os.system(OMB_CP_BIN + ' -rp ' + jffs2_path + '/* ' + dst_path) != 0:
-					self.showError(_("Error copying unpacked rootfs"))
-					rc = False
-				if os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path) != 0:
-					self.showError(_("Error copying kernel"))
-					rc = False
-			else:
-				self.showError(_("Generic error in unpaack process"))
-				rc = False
-			os.system(OMB_UMOUNT_BIN + ' ' + jffs2_path)
-			os.system(OMB_RMMOD_BIN + ' block2mtd')
-			os.system(OMB_RMMOD_BIN + ' mtdblock')
-			os.system(OMB_RMMOD_BIN + ' loop')
-
-		if self.afterInstallImage(dst_path):
-			rc = True
-		else:
-			rc = False
-
-		return rc
-
-	def installImageUBI(self, src_path, dst_path, kernel_dst_path, tmp_folder):
-		rc = True
-		for i in range(0, 20):
-			mtdfile = "/dev/mtd" + str(i)
-			if os.path.exists(mtdfile) is False:
-				break
-		mtd = str(i)
-		base_path = src_path + '/' + (self.alt_install and config.plugins.omb.alternative_image_folder.value or OMB_GETIMAGEFOLDER)
-		rootfs_path = base_path + '/' + OMB_GETMACHINEROOTFILE
-		kernel_path = base_path + '/' + OMB_GETMACHINEKERNELFILE
-		ubi_path = src_path + '/ubi'
-		# This is idea from EGAMI Team to handle universal UBIFS unpacking - used only for INI-HDp model
-		if OMB_GETMACHINEBUILD in ('inihdp'):
-			if fileExists("/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/ubi_reader/ubi_extract_files.py"):
-				ubifile = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/ubi_reader/ubi_extract_files.py"
-			elif fileExists("/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/ubi_reader/ubi_extract_files.pyo"):
-				ubifile = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/ubi_reader/ubi_extract_files.pyo"
-			else:
-				self.showError(_("Your STB doesn\'t seem supported"))
-				return False
-			cmd= "chmod 755 " + ubifile
-			rc = os.system(cmd)
-			cmd = "python " + ubifile + " " + rootfs_path + " -o " + ubi_path
-			rc = os.system(cmd)
-			os.system(OMB_CP_BIN + ' -rp ' + ubi_path + '/rootfs/* ' + dst_path)
-			rc = os.system(cmd)
-			cmd = ('chmod -R +x ' + dst_path)
-			rc = os.system(cmd)
-			cmd = 'rm -rf ' + ubi_path
-			rc = os.system(cmd)
-			os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path)
-			return True
-		virtual_mtd = tmp_folder + '/virtual_mtd'
-		os.system(OMB_MODPROBE_BIN + ' nandsim cache_file=' + virtual_mtd + ' ' + self.nandsim_parm)
-		if not os.path.exists('/dev/mtd' + mtd):
-			os.system('rmmod nandsim')
-			self.showError(_("Cannot create virtual MTD device"))
-			return False
-		if not os.path.exists('/dev/mtdblock' + mtd):
-			os.system(OMB_DD_BIN + ' if=' + rootfs_path + ' of=/dev/mtd' + mtd + ' bs=2048')
-		else:
-			os.system(OMB_DD_BIN + ' if=' + rootfs_path + ' of=/dev/mtdblock' + mtd + ' bs=2048')
-		os.system(OMB_UBIATTACH_BIN + ' /dev/ubi_ctrl -m ' + mtd + ' -O ' + self.vid_offset)
-		os.system(OMB_MOUNT_BIN + ' -t ubifs ubi1_0 ' + ubi_path)
-		if os.path.exists(ubi_path + '/usr/bin/enigma2'):
-			if os.system(OMB_CP_BIN + ' -rp ' + ubi_path + '/* ' + dst_path) != 0:
-				self.showError(_("Error copying unpacked rootfs"))
-				rc = False
-			if os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path) != 0:
-				self.showError(_("Error copying kernel"))
-				rc = False
-		else:
-			self.showError(_("Generic error in unpaack process"))
-			rc = False
-		os.system(OMB_UMOUNT_BIN + ' ' + ubi_path)
-		os.system(OMB_UBIDETACH_BIN + ' -m ' + mtd)
-		os.system(OMB_RMMOD_BIN + ' nandsim')
-
-		if self.afterInstallImage(dst_path):
-			rc = True
-		else:
-			rc = False
-
-		return rc
-
-	def extractImageNFI(self, nfifile, extractdir):
-		nfidata = open(nfifile, 'r')
-		header = nfidata.read(32)
-		if header[:3] != 'NFI':
-			print('[OMB] Sorry, old NFI format deteced')
-			nfidata.close()
-			return False
-		else:
-			machine_type = header[4:4+header[4:].find('\0')]
-			if header[:4] == 'NFI3':
-				machine_type = 'dm7020hdv2'
-		print('[OMB] Dreambox image type: %s' % machine_type)
-		if machine_type == 'dm800' or machine_type == 'dm500hd' or machine_type == 'dm800se':
-			self.esize = '0x4000,0x200'
-			self.vid_offset = '512'
-			bs = 512
-			bso = 528
-		elif machine_type == 'dm7020hd':
-			self.esize = '0x40000,0x1000'
-			self.vid_offset = '4096'
-			self.nandsim_parm = 'first_id_byte=0xec second_id_byte=0xd5 third_id_byte=0x51 fourth_id_byte=0xa6'
-			bs = 4096
-			bso = 4224
-		elif machine_type == 'dm8000':
-			self.esize = '0x20000,0x800'
-			self.vid_offset = '512'
-			bs = 2048
-			bso = 2112
-		else: # dm7020hdv2, dm500hdv2, dm800sev2
-			self.esize = '0x20000,0x800'
-			self.vid_offset = '2048'
-			self.nandsim_parm = 'first_id_byte=0xec second_id_byte=0xd3 third_id_byte=0x51 fourth_id_byte=0x95'
-			bs = 2048
-			bso = 2112
-		(total_size, ) = struct.unpack('!L', nfidata.read(4))
-		print('[OMB] Total image size: %s Bytes' % total_size)
-		part = 0
-		while nfidata.tell() < total_size:
-			(size, ) = struct.unpack('!L', nfidata.read(4))
-			print('[OMB] Processing partition # %d size %d Bytes' % (part, size))
-			output_names = { 2: 'kernel.bin', 3: 'rootfs.bin' }
-			if part not in output_names:
-				nfidata.seek(size, 1)
-				print('[OMB] Skipping %d data...' % size)
-			else:
-				print('[OMB] Extracting %s with %d blocksize...' % (output_names[part], bs))
-				output_filename = extractdir + '/' + output_names[part]
-				if os.path.exists(output_filename):
-					os.remove(output_filename)
-				output = open(output_filename, 'wb')
-				if part == 2:
-					output.write(nfidata.read(size))
+					return False
 				else:
-					for sector in range(size / bso):
-						d = nfidata.read(bso)
-						output.write(d[:bs])
-				output.close()
-			part = part + 1
-		nfidata.close()
-		print('[OMB] Extracting %s to %s Finished!' % (nfifile, extractdir))
-		return True
+					return True
+			else:
+				self.showError(_("Error unpacking rootfs"))
+				return False
+		else:
+			self.showError(_("Your STB doesn\'t seem supported"))
+			return False
 
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
-		CHK_ERROR = False
 		if not os.path.exists(dst_path + "/sbin"):
-			CHK_ERROR = True
-			return True
+			return False
+
+		if os.path.exists(dst_path + '/usr/bin/multiboot-selector.sh'):
+			return False
 		
 		if os.path.exists(dst_path + '/etc/hostname'):
 			f = open(dst_path + '/etc/hostname', "r")
 			b_type = str(f.read().lower().strip())
 			f.close()
 			if BOX_NAME != b_type and BOX_NAME not in b_type:
-				CHK_ERROR = True
-				return True
+				return False
 
 		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]:
 			if os.path.exists('/usr/lib/python' + pyver):
@@ -824,11 +674,11 @@ class OMBManagerInstall(Screen):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
 				break
 
-		if BOX_NAME and not CHK_ERROR:
+		if BOX_NAME:
 			f = open(dst_path + '/etc/.box_type', "w")
 			f.write(BOX_NAME)
 			f.close()
-		if BOX_MODEL and not CHK_ERROR:
+		if BOX_MODEL:
 			f = open(dst_path + '/etc/.brand_oem', "w")
 			f.write(BOX_MODEL)
 			f.close()

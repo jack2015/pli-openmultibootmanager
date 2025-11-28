@@ -259,34 +259,11 @@ if BOX_NAME and BOX_MODEL:
 			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
 	elif BOX_MODEL == "dreambox":
-		if BOX_NAME in ("dm500hd", "dm800", "dm800se"):
-			OMB_GETIMAGEFILESYSTEM = "jffs2.nfi"
-		elif BOX_NAME in ("dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
-			OMB_GETIMAGEFILESYSTEM = "ubi.nfi"
-		elif BOX_NAME == "dm900":
+		if BOX_NAME in ("dm900", "dm920"):
 			OMB_GETMACHINEKERNELFILE = "kernel.bin"
 			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
 			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-			OMB_GETIMAGEFOLDER = "dm900"
-		elif BOX_NAME == "dm920":
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-			OMB_GETIMAGEFOLDER = "dm920"
-		elif BOX_NAME == "dm7080":
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-			OMB_GETIMAGEFOLDER = "dm7080"
-		elif BOX_NAME == "dm820":
-			OMB_GETMACHINEKERNELFILE = "kernel.bin"
-			OMB_GETIMAGEFILESYSTEM = "tar.bz2"
-			OMB_GETMACHINEROOTFILE = "rootfs.tar.bz2"
-			OMB_GETIMAGEFOLDER = "dm820"
-		elif BOX_NAME in ("dm520", "dm525"):
-			OMB_GETIMAGEFILESYSTEM = "tar.xz"
-		else:
-			OMB_GETIMAGEFILESYSTEM = ""
+			OMB_GETIMAGEFOLDER = BOX_NAME
 
 OMB_DD_BIN = '/bin/dd'
 OMB_CP_BIN = '/bin/cp'

@@ -500,16 +500,17 @@ class OMBManagerInstall(Screen):
 		tarbz2file = glob.glob('%s/*.bz2' % tmp_folder)
 
 		if nfifile:
+			CMD_LINE = ""
 			if BOX_MODEL != "dreambox":
 				self.showError(_("Your STB doesn\'t seem supported"))
 				return
 			if BOX_NAME in ("dm800", "dm500hd", "dm800se", "dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
-				if os.path.exists(OMB_NFIDUMP_BIN): # When use nfidump
+				if os.path.exists(OMB_NFIDUMP_BIN):
 					if BOX_NAME in ("dm800", "dm500hd", "dm800se"):
-						os.system(OMB_NFIDUMP_BIN + ' --squashfskeep ' + nfifile[0] + ' ' + target_folder)
+						CMD_LINE = OMB_NFIDUMP_BIN + ' --squashfskeep ' + nfifile[0] + ' ' + target_folder
 					else:
-						os.system(OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder)
-					if not os.path.exists(target_folder + "/usr/bin/enigma2"):
+						CMD_LINE = OMB_NFIDUMP_BIN + ' -s ' + nfifile[0] + ' ' + target_folder
+					if os.system(CMD_LINE) != 0 and not os.path.exists(target_folder + "/usr/bin/enigma2"):
 						self.showError(_("Cannot extract nfi image"))
 						os.system(OMB_RM_BIN + ' -rf ' + target_folder)
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
@@ -517,6 +518,10 @@ class OMBManagerInstall(Screen):
 						self.afterInstallImage(target_folder)
 						self.messagebox.close()
 						self.close(target_folder)
+				else:
+					self.showError(_("Cannot find nfidump tools"))
+					os.system(OMB_RM_BIN + ' -rf ' + target_folder)
+					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 			else:
 				self.showError(_("Your STB doesn\'t seem supported"))
 
@@ -792,13 +797,18 @@ class OMBManagerInstall(Screen):
 
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
-		CHK_ERROR = True
+		CHK_ERROR = False
+		if not os.path.exists(dst_path + "/sbin"):
+			CHK_ERROR = True
+			return True
+		
 		if os.path.exists(dst_path + '/etc/hostname'):
 			f = open(dst_path + '/etc/hostname', "r")
 			b_type = str(f.read().lower().strip())
 			f.close()
 			if BOX_NAME != b_type and BOX_NAME not in b_type:
-				CHK_ERROR = False
+				CHK_ERROR = True
+				return True
 
 		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]:
 			if os.path.exists('/usr/lib/python' + pyver):
@@ -814,11 +824,11 @@ class OMBManagerInstall(Screen):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
 				break
 
-		if BOX_NAME and CHK_ERROR:
+		if BOX_NAME and not CHK_ERROR:
 			f = open(dst_path + '/etc/.box_type', "w")
 			f.write(BOX_NAME)
 			f.close()
-		if BOX_MODEL and CHK_ERROR:
+		if BOX_MODEL and not CHK_ERROR:
 			f = open(dst_path + '/etc/.brand_oem', "w")
 			f.write(BOX_MODEL)
 			f.close()

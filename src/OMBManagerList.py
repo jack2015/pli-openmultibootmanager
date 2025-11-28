@@ -187,6 +187,7 @@ class OMBManagerList(Screen):
 					continue
 				if not self.isCompatible(self.data_dir + '/' + file_entry):
 					os.system('rm -rf ' + self.data_dir + '/' + file_entry)
+					os.system('rm -f ' + self.data_dir + '/.kernels/' + file_entry + '.bin')
 					continue
 				if os.path.exists(self.data_dir + '/.label_' + file_entry):
 					title = self.imageTitleFromLabel('.label_' + file_entry)

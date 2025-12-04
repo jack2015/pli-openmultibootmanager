@@ -51,7 +51,8 @@ class OMBManagerInit:
 						else:
 							disks_list.append((_('Find unknown device. Please reboot machine'), None))
 					else:
-						disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
+						if p.device is not None:
+							disks_list.append((p.description + ' (%s)' % p.mountpoint, p))
 				else:
 					disks_list.append((_('Find unknown device. Please reboot machine'), None))
 

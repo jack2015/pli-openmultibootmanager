@@ -392,6 +392,10 @@ class OMBManagerInstall(Screen):
 		patch_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch'
 		loadScript = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/install-nandsim.sh"
 
+		check_kernel_file = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels/flash.bin'
+		if not os.path.exists(check_kernel_file):
+			os.system('cp /boot/zImage-3.14* ' + check_kernel_file)
+
 		if self.dm900_clone_install and BOX_NAME == "dm900":
 			dm900_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm900-patch.tar.xz'
 			self.dream_path = dm900_path

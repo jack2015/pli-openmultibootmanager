@@ -608,6 +608,7 @@ class OMBManagerInstall(Screen):
 		base_path = src_path + '/' + (self.alt_install and config.plugins.omb.alternative_image_folder.value or OMB_GETIMAGEFOLDER)
 		rootfs_path = base_path + '/' + OMB_GETMACHINEROOTFILE
 		kernel_path = base_path + '/' + OMB_GETMACHINEKERNELFILE
+		kernel_path2 = dst_path + '/boot/zImage-3.14*'
 
 		if os.system(OMB_TAR_BIN + ' xjf %s -C %s' % (rootfs_path,dst_path)) != 0:
 			self.showError(_("Error unpacking rootfs"))
@@ -615,8 +616,11 @@ class OMBManagerInstall(Screen):
 		if self.afterInstallImage(dst_path):
 			if os.path.exists(dst_path + '/usr/bin/enigma2'):
 				if os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path) != 0:
-					self.showError(_("Error copying kernel"))
-					return False
+					if os.system(OMB_CP_BIN + ' ' + kernel_path2 + ' ' + kernel_dst_path) != 0:
+						self.showError(_("Error copying kernel"))
+						return False
+					else:
+						return True
 				else:
 					return True
 			else:

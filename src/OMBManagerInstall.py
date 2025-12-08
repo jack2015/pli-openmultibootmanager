@@ -628,7 +628,7 @@ class OMBManagerInstall(Screen):
 			return False
 
 		if os.path.exists(dst_path + '/usr/bin/multiboot-selector.sh'):
-			return False
+			os.system('rm -f ' + dst_path + '/usr/bin/multiboot-selector.sh')
 		
 		if os.path.exists(dst_path + '/etc/hostname'):
 			f = open(dst_path + '/etc/hostname', "r")
@@ -637,7 +637,7 @@ class OMBManagerInstall(Screen):
 			if BOX_NAME != b_type and BOX_NAME not in b_type:
 				return False
 
-		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]:
+		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]:
 			if os.path.exists('/usr/lib/python' + pyver):
 				if not os.path.exists('/usr/lib/python' + pyver +'/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
 					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python' + pyver +'/boxbranding.so')

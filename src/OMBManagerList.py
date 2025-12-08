@@ -351,7 +351,8 @@ class OMBManagerList(Screen):
 	def isCompatible(self, base_path):
 		archconffile = "%s/usr/bin/multiboot-selector.sh" % base_path
 		if os.path.exists(archconffile):
-			return False
+			os.system('rm -f ' + archconffile)
+
 		if os.path.exists("/etc/.box_type"):
 			f = open("/etc/.box_type", "r")
 			running = str(f.read().lower().strip())
@@ -513,6 +514,13 @@ class OMBManagerList(Screen):
 				current_value = self.isNextTimeout()
 				name_text = _("Timeout boot menu: next %d sec") % current_value
 				menu.append((name_text, "timeout"))
+
+			if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+				menu.append((_("Disable boot with flash kernel"), "bootflashdisable"))
+			else:
+				menu.append((_("Enable boot with flash kernel"), "bootflashenable"))
+
+
 			menu.append((_("Alternative name image folder") + ": %s" % config.plugins.omb.alternative_image_folder.value, "folder"))
 		if not self.checkMountFix():
 			menu.append((_("Fix mount devices (for PLi)"), "fix_mount"))
@@ -530,6 +538,17 @@ class OMBManagerList(Screen):
 						cmd = "touch " + self.data_dir + '/.bootmenu.lock'
 						os.system(cmd)
 						self.refresh()
+				elif choice[1] == "bootflashdisable":
+					if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+						file_entry = self.data_dir + '/.bootflash.unlock'
+						os.system('rm ' + file_entry)
+						self.refresh()
+				elif choice[1] == "bootflashenable":
+					if not os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+						cmd = "touch " + self.data_dir + '/.bootflash.unlock'
+						os.system(cmd)
+						self.refresh()
+
 				elif choice[1] == "disable":
 					os.system('rm -f /sbin/init')
 					os.system('ln -sf /sbin/init.sysvinit /sbin/init')

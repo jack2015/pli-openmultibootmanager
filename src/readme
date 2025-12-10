@@ -2,7 +2,7 @@
 - Maybe not loading you box if use OpenMultiBoot with the following connected devices: usb hub (power) / usb LCD display / usb tuners(DVB-T/C/S) / 3G modem and etc usb device
 - < device > has to be formated in ext3 or ext4
 - < device > should be a fast usb-stick or ssd or mmc - not recommended to use a normal hdd as hdd would almost never stop spinning
-- < image > not support openatv 7.6+
+- < image > maybe support openatv 7.6+
 - Upload any zipped image to < device >/open-multiboot-upload or /omb/open-multiboot-upload
 - Zipped image needs regular folderstructure like flashing from usb-device
 - It is not recommended to re-use existing settings - do not blame us if problems occur

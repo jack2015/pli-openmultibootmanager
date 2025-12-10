@@ -450,7 +450,7 @@ class OMBManagerInstall(Screen):
 		target_folder = self.mount_point + '/' + OMB_DATA_DIR + '/' + selected_image_identifier
 		kernel_target_folder = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels'
 		kernel_target_file = kernel_target_folder + '/' + selected_image_identifier + '.bin'
-		datafile_dir = self.mount_point + '/' + OMB_DATA_DIR
+		datafile_dir = self.mount_point + '/' + OMB_DATA_DIR + '/'
 
 		if not os.path.exists(OMB_MAIN_DIR):
 			try:

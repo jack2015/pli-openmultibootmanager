@@ -8,7 +8,7 @@ setup(name = 'enigma2-plugin-extensions-openmultiboot',
 		author_email='dima-73@inbox.lv',
 		package_dir = {'Extensions.OpenMultiboot': 'src'},
 		packages=['Extensions.OpenMultiboot'],
-		package_data={'Extensions.OpenMultiboot': ['plugin.png', 'readme', 'install-nandsim.sh']},
+		package_data={'Extensions.OpenMultiboot': ['plugin.png', 'readme', 'subprocess.02', 'subprocess.03', 'install-nandsim.sh']},
 		description = 'Multi boot loader manager for enigma2 box',
 		cmdclass = setup_translate.cmdclass,
 	)

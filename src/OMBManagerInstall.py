@@ -47,6 +47,7 @@ except:
 
 BOX_NAME = ""
 BOX_MODEL = ""
+Plugins_Path = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot"
 if fileExists("/proc/stb/info/vumodel") and not fileExists("/proc/stb/info/hwmodel") and not fileExists("/proc/stb/info/boxtype") and not fileExists("/proc/stb/info/gbmodel"):
 	try:
 		l = open("/proc/stb/info/vumodel")
@@ -166,7 +167,7 @@ else:
 		if BOX_NAME[0:2] == "dm":
 			BOX_MODEL = "dreambox"
 	except:
-		if os.path.exists('/etc/hostname'):
+		if fileExists('/etc/hostname'):
 			f = open("/etc/hostname", "r")
 			BOX_NAME = f.read().strip()
 			f.close()
@@ -393,13 +394,13 @@ class OMBManagerInstall(Screen):
 		loadScript = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/install-nandsim.sh"
 
 		check_kernel_file = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels/flash.bin'
-		if not os.path.exists(check_kernel_file):
+		if not fileExists(check_kernel_file):
 			os.system('cp /boot/zImage-3.14* ' + check_kernel_file)
 
 		if self.dm900_clone_install and BOX_NAME == "dm900":
 			dm900_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm900-patch.tar.xz'
 			self.dream_path = dm900_path
-			if not os.path.exists(dm900_path):
+			if not fileExists(dm900_path):
 				cmd = "%s dm900_patch %s" % (loadScript,patch_path)
 				text = _("Download DM900 clone patch files")
 				self.session.openWithCallback(self.afterLoadpatchInstalldm900, Console, text, [cmd])
@@ -408,7 +409,7 @@ class OMBManagerInstall(Screen):
 		if self.dm800se_clone_install and BOX_NAME == "dm800se":
 			dm800se_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm800se-patch.tar.xz'
 			self.dream_path = dm800se_path
-			if not os.path.exists(dm800se_path):
+			if not fileExists(dm800se_path):
 				cmd = "%s dm800se_patch %s" % (loadScript,patch_path)
 				text = _("Download DM800SE clone patch files")
 				self.session.openWithCallback(self.afterLoadpatchInstalldm800se, Console, text, [cmd])
@@ -434,10 +435,10 @@ class OMBManagerInstall(Screen):
 	def guessIdentifierName(self, selected_image):
 		selected_image = selected_image.replace(' ', '_')
 		prefix = self.mount_point + '/' + OMB_DATA_DIR + '/'
-		if not os.path.exists(prefix + selected_image):
+		if not fileExists(prefix + selected_image):
 			return selected_image
 		count = 1
-		while os.path.exists(prefix + selected_image + '_' + str(count)):
+		while fileExists(prefix + selected_image + '_' + str(count)):
 			count += 1
 		return selected_image + '_' + str(count)
 
@@ -449,6 +450,7 @@ class OMBManagerInstall(Screen):
 		target_folder = self.mount_point + '/' + OMB_DATA_DIR + '/' + selected_image_identifier
 		kernel_target_folder = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels'
 		kernel_target_file = kernel_target_folder + '/' + selected_image_identifier + '.bin'
+		datafile_dir = self.mount_point + '/' + OMB_DATA_DIR
 
 		if not os.path.exists(OMB_MAIN_DIR):
 			try:
@@ -497,7 +499,7 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 				return
 			if BOX_NAME in ("dm800", "dm500hd", "dm800se", "dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
-				if os.path.exists(OMB_NFIDUMP_BIN):
+				if fileExists(OMB_NFIDUMP_BIN):
 					if BOX_NAME in ("dm800", "dm500hd", "dm800se"):
 						CMD_LINE = OMB_NFIDUMP_BIN + ' --squashfskeep ' + nfifile[0] + ' ' + target_folder
 					else:
@@ -538,6 +540,9 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 					os.system(OMB_RM_BIN + ' -f ' + source_file)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					f = open(datafile_dir + '.timer', "w")
+					f.write("10")
+					f.close()
 					self.messagebox.close()
 					self.close(target_folder)
 				else:
@@ -560,6 +565,9 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 					os.system(OMB_RM_BIN + ' -f ' + source_file)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					f = open(datafile_dir + '.timer', "w")
+					f.write("10")
+					f.close()
 					self.messagebox.close()
 					self.close(target_folder)
 				else:
@@ -582,6 +590,9 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 					os.system(OMB_RM_BIN + ' -f ' + source_file)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					f = open(datafile_dir + '.timer', "w")
+					f.write("10")
+					f.close()
 					self.messagebox.close()
 					self.close(target_folder)
 				else:
@@ -593,6 +604,9 @@ class OMBManagerInstall(Screen):
 			if self.installImageTARBZ2(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				f = open(datafile_dir + '.timer', "w")
+				f.write("10")
+				f.close()
 				self.messagebox.close()
 				self.close(target_folder)
 			else:
@@ -635,29 +649,30 @@ class OMBManagerInstall(Screen):
 		if not os.path.exists(dst_path + "/sbin"):
 			return False
 
-		if os.path.exists(dst_path + '/usr/bin/multiboot-selector.sh'):
+		if fileExists(dst_path + '/usr/bin/multiboot-selector.sh'):
 			os.system('rm -f ' + dst_path + '/usr/bin/multiboot-selector.sh')
 		
-		if os.path.exists(dst_path + '/etc/hostname'):
+		if fileExists(dst_path + '/etc/hostname'):
 			f = open(dst_path + '/etc/hostname', "r")
 			b_type = str(f.read().lower().strip())
 			f.close()
 			if BOX_NAME != b_type and BOX_NAME not in b_type:
 				return False
 
-		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]:
-			if os.path.exists('/usr/lib/python' + pyver):
-				if not os.path.exists('/usr/lib/python' + pyver +'/boxbranding.so') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python' + pyver +'/boxbranding.so')
-				if os.path.exists(dst_path + '/usr/lib/python' + pyver +'/boxbranding.py') and os.path.exists('/usr/lib/enigma2/python/boxbranding.so'):
-					os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
-					os.system('rm -f ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.py')
-				if not os.path.exists(dst_path + '/usr/lib/python' + pyver +'/subprocess.pyo') and os.path.exists('/usr/lib/python' + pyver +'/subprocess.pyo'):
-					os.system('cp -f /usr/lib/python' + pyver +'/subprocess.pyo ' + dst_path + '/usr/lib/python' + pyver +'/subprocess.pyo')
-				if os.path.exists('/usr/lib/enigma2/python/boxbranding.so') and not os.path.exists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
-					os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/enigma2/python/boxbranding.so')
-					os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
-				break
+		if fileExists('/usr/lib/enigma2/python/boxbranding.so') and not fileExists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
+			os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/enigma2/python/boxbranding.so')
+					
+		for pyver in [ "2.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15", "3.16", "3.17", "3.18", "3.19"]:
+			if os.path.exists('/usr/lib/python' + pyver) and fileExists('/usr/lib/enigma2/python/boxbranding.so'):
+				os.system('ln -sf /usr/lib/enigma2/python/boxbranding.so /usr/lib/python' + pyver +'/boxbranding.so')
+			if os.path.exists(dst_path + '/usr/lib/python' + pyver) and fileExists('/usr/lib/enigma2/python/boxbranding.so'):
+				os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/python' + pyver +'/boxbranding.so')
+				if pyver == "2.7" :
+					if not fileExists(dst_path + '/usr/lib/python2.7/subprocess.pyo'):
+						os.system("cp -f " + Plugins_Path + '/subprocess.02 ' + dst_path + '/usr/lib/python2.7/subprocess.pyo')																								
+				else:
+					if not fileExists(dst_path + '/usr/lib/python' + pyver +'/subprocess.py') and not fileExists(dst_path + '/usr/lib/python' + pyver +'/subprocess.pyc'):
+						os.system("cp -f " + Plugins_Path + '/subprocess.03 ' + dst_path + '/usr/lib/python' + pyver +'/subprocess.py')
 
 		if BOX_NAME:
 			f = open(dst_path + '/etc/.box_type', "w")
@@ -668,10 +683,11 @@ class OMBManagerInstall(Screen):
 			f.write(BOX_MODEL)
 			f.close()
 
-		if not os.path.exists(dst_path + '/usr/sbin/nfidump') and os.path.exists('/usr/sbin/nfidump'):
+		if not fileExists(dst_path + '/usr/sbin/nfidump') and fileExists('/usr/sbin/nfidump'):
 			os.system("cp -f /usr/sbin/nfidump " + dst_path + "/usr/sbin/nfidump")
 		if os.path.isfile(dst_path + '/sbin/open_multiboot'):
 			os.system("rm -f " + dst_path + '/sbin/open_multiboot')
+			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
 			os.system("rm -f " + dst_path + '/sbin/init')
 			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/init')
 			os.system('ln -sf /sbin/init.sysvinit ' + dst_path + '/sbin/open_multiboot')
@@ -679,10 +695,12 @@ class OMBManagerInstall(Screen):
 			os.system("rm -f " + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system("sed -i -e '/mtdblock2/d' " + dst_path + "/etc/fstab")
+		os.system("sed -i -e '/mmcblk0p3/d' " + dst_path + "/etc/fstab")
+
 		fix = False
 		error = False
 		file = dst_path + '/etc/init.d/volatile-media.sh'
-		if os.path.exists(file):
+		if fileExists(file):
 			try:
 				f = open(file, 'r')
 				for line in f.readlines():
@@ -707,11 +725,11 @@ class OMBManagerInstall(Screen):
 		return True
 
 	def afterLoadpatchInstalldm900(self):
-		if not os.path.exists(self.dream_path):
+		if not fileExists(self.dream_path):
 			self.error_message = _('Cannot download dm900 clone patch... ')
 			self.session.open(MessageBox, self.error_message, type = MessageBox.TYPE_ERROR)
 
 	def afterLoadpatchInstalldm800se(self):
-		if not os.path.exists(self.dream_path):
+		if not fileExists(self.dream_path):
 			self.error_message = _('Cannot download dm800se clone patch... ')
 			self.session.open(MessageBox, self.error_message, type = MessageBox.TYPE_ERROR)

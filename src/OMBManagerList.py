@@ -470,6 +470,7 @@ class OMBManagerList(Screen):
 			return
 		text = _("Please select the necessary option...")
 		menu = [(_("Readme"), "readme")]
+		menu.append((_("Flash kernel immediately - Gain better compatibility"), "kernel"))
 		if self.checkflashImage():
 			if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd" or BOX_NAME == "h7" or BOX_NAME == "gbquad4k" or BOX_NAME == "gbue4k":
 				mount_part = os.popen("readlink /dev/root").read()
@@ -508,9 +509,8 @@ class OMBManagerList(Screen):
 			else:
 				menu.append((_("Install '/sbin/open_multiboot'"), "multiboot"))
 			if os.path.isfile(self.data_dir + '/.bootmenu.lock'):
-				menu.append((_("Enable boot menu"), "bootenable"))
+				os.system('rm -f ' + self.data_dir + '/.bootmenu.lock')
 			else:
-				menu.append((_("Disable boot menu"), "bootdisable"))
 				current_value = self.isNextTimeout()
 				name_text = _("Timeout boot menu: next %d sec") % current_value
 				menu.append((name_text, "timeout"))
@@ -528,16 +528,6 @@ class OMBManagerList(Screen):
 			if choice:
 				if choice[1] == "readme":
 					self.session.open(Console,_("Readme"),["cat /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/readme"])
-				elif choice[1] == "bootenable":
-					if os.path.isfile(self.data_dir + '/.bootmenu.lock'):
-						file_entry = self.data_dir + '/.bootmenu.lock'
-						os.system('rm ' + file_entry)
-						self.refresh()
-				elif choice[1] == "bootdisable":
-					if not os.path.isfile(self.data_dir + '/.bootmenu.lock'):
-						cmd = "touch " + self.data_dir + '/.bootmenu.lock'
-						os.system(cmd)
-						self.refresh()
 				elif choice[1] == "bootflashdisable":
 					if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
 						file_entry = self.data_dir + '/.bootflash.unlock'
@@ -558,6 +548,13 @@ class OMBManagerList(Screen):
 					os.system('rm -f ' + file_entry)
 					os.system('rm -f ' + file_entry1)
 					self.refresh()
+
+				elif choice[1] == "kernel":
+					if os.system('/usr/sbin/flash-kernel /boot/zImage-3.14-1.17-' +BOX_NAME) == 0:
+						self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
+					else:
+						self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
+
 				elif choice[1] == "enable":
 					if not self.checkMountFix():
 						self.session.open(MessageBox,_("Fix mount devices (for PLi)") + " !", MessageBox.TYPE_INFO)

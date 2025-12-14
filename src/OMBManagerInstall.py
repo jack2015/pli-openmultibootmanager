@@ -321,10 +321,9 @@ class OMBManagerInstall(Screen):
 		self.alt_install = False
 		self.dm900_clone_install = False
 		self.dm800se_clone_install = False
+		self.compat_dm9x0 = False
 		self.dream_path = ""
-		self.esize = "128KiB"
-		self.vid_offset = "2048"
-		self.nandsim_parm = "first_id_byte=0x20 second_id_byte=0xac third_id_byte=0x00 fourth_id_byte=0x15"
+		self.check_kernel_file = ""
 		self['info'] = Label(_("Choose the image to install"))
 		self["list"] = List(upload_list)
 		self["key_red"] = Button(_('Exit'))
@@ -366,6 +365,9 @@ class OMBManagerInstall(Screen):
 		menu = [(_("Standard install"), "standard"), (_("Use altenative folder"), "altenative")]
 		if BOX_NAME == "dm900":
 			menu.append((_("Install DM900 with clone patch"), "dm900clone"))
+			menu.append((_("Compatible install Use DM920 firmware"), "compat_dm9x0"))
+		elif BOX_NAME == "dm920":
+			menu.append((_("Compatible install Use DM900 firmware"), "compat_dm9x0"))
 		elif BOX_NAME == "dm800se":
 			menu.append((_("Install DM800SE with clone patch"), "dm800seclone"))
 		def setAction(choice):
@@ -382,6 +384,9 @@ class OMBManagerInstall(Screen):
 				elif choice[1] == "dm800seclone":
 					self.dm800se_clone_install = True
 					self.keyPostInstall()
+				elif choice[1] == "compat_dm9x0":
+					self.compat_dm9x0 = True
+					self.keyPostInstall()
 
 		dlg = self.session.openWithCallback(setAction, ChoiceBox, title=text, list=menu)
 
@@ -392,10 +397,7 @@ class OMBManagerInstall(Screen):
 
 		patch_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch'
 		loadScript = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/install-nandsim.sh"
-
-		check_kernel_file = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels/flash.bin'
-		if not fileExists(check_kernel_file):
-			os.system('cp /boot/zImage-3.14* ' + check_kernel_file)
+		self.check_kernel_file = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels/flash.bin'
 
 		if self.dm900_clone_install and BOX_NAME == "dm900":
 			dm900_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm900-patch.tar.xz'
@@ -533,13 +535,17 @@ class OMBManagerInstall(Screen):
 			else:
 				if self.afterInstallImage(target_folder):
 					if BOX_NAME in ("dm900", "dm920"):
-						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+						if not self.compat_dm9x0:
+							os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+						else:
+							os.system(OMB_CP_BIN + ' ' + '/boot/zImage-3.14* ' + kernel_target_file)
 					elif BOX_NAME in ("dm820", "dm7080"):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 					elif BOX_NAME in ("dm520", "dm525"):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 					os.system(OMB_RM_BIN + ' -f ' + source_file)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					os.system('cp /boot/zImage-3.14* ' + self.check_kernel_file)
 					f = open(datafile_dir + '.timer', "w")
 					f.write("10")
 					f.close()
@@ -558,13 +564,17 @@ class OMBManagerInstall(Screen):
 			else:
 				if self.afterInstallImage(target_folder):
 					if BOX_NAME in ("dm900", "dm920"):
-						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+						if not self.compat_dm9x0:
+							os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+						else:
+							os.system(OMB_CP_BIN + ' ' + '/boot/zImage-3.14* ' + kernel_target_file)
 					elif BOX_NAME in ("dm820", "dm7080"):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 					elif BOX_NAME in ("dm520", "dm525"):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 					os.system(OMB_RM_BIN + ' -f ' + source_file)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					os.system('cp /boot/zImage-3.14* ' + self.check_kernel_file)
 					f = open(datafile_dir + '.timer', "w")
 					f.write("10")
 					f.close()
@@ -583,13 +593,17 @@ class OMBManagerInstall(Screen):
 			else:
 				if self.afterInstallImage(target_folder):
 					if BOX_NAME in ("dm900", "dm920"):
-						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+						if not self.compat_dm9x0:
+							os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/zImage-3.14* ' + kernel_target_file)
+						else:
+							os.system(OMB_CP_BIN + ' ' + '/boot/zImage-3.14* ' + kernel_target_file)
 					elif BOX_NAME in ("dm820", "dm7080"):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.bin ' + kernel_target_file)
 					elif BOX_NAME in ("dm520", "dm525"):
 						os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux.gz ' + kernel_target_file)
 					os.system(OMB_RM_BIN + ' -f ' + source_file)
 					os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+					os.system('cp /boot/zImage-3.14* ' + self.check_kernel_file)
 					f = open(datafile_dir + '.timer', "w")
 					f.write("10")
 					f.close()
@@ -604,6 +618,7 @@ class OMBManagerInstall(Screen):
 			if self.installImageTARBZ2(tmp_folder, target_folder, kernel_target_file, tmp_folder):
 				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				os.system('cp /boot/zImage-3.14* ' + self.check_kernel_file)
 				f = open(datafile_dir + '.timer', "w")
 				f.write("10")
 				f.close()
@@ -619,7 +634,13 @@ class OMBManagerInstall(Screen):
 			os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 
 	def installImageTARBZ2(self, src_path, dst_path, kernel_dst_path, tmp_folder):
-		base_path = src_path + '/' + (self.alt_install and config.plugins.omb.alternative_image_folder.value or OMB_GETIMAGEFOLDER)
+		if self.compat_dm9x0:
+			if fileExists(src_path + '/dm900'):
+				base_path = src_path + '/dm900'
+			else:
+				base_path = src_path + '/dm920'
+		else:
+			base_path = src_path + '/' + (self.alt_install and config.plugins.omb.alternative_image_folder.value or OMB_GETIMAGEFOLDER)
 		rootfs_path = base_path + '/' + OMB_GETMACHINEROOTFILE
 		kernel_path = base_path + '/' + OMB_GETMACHINEKERNELFILE
 		kernel_path2 = dst_path + '/boot/zImage-3.14*'
@@ -629,6 +650,9 @@ class OMBManagerInstall(Screen):
 			return False
 		if self.afterInstallImage(dst_path):
 			if os.path.exists(dst_path + '/usr/bin/enigma2'):
+				if self.compat_dm9x0:
+					os.system(OMB_CP_BIN + ' ' + '/boot/zImage-3.14* ' + kernel_dst_path)
+					return True
 				if os.system(OMB_CP_BIN + ' ' + kernel_path + ' ' + kernel_dst_path) != 0:
 					if os.system(OMB_CP_BIN + ' ' + kernel_path2 + ' ' + kernel_dst_path) != 0:
 						self.showError(_("Error copying kernel"))
@@ -657,7 +681,18 @@ class OMBManagerInstall(Screen):
 			b_type = str(f.read().lower().strip())
 			f.close()
 			if BOX_NAME != b_type and BOX_NAME not in b_type:
-				return False
+				if self.compat_dm9x0 and (b_type in ("dm900", "dm920")):
+					os.system('cp -f /etc/hostname ' + dst_path + '/etc/hostname')
+					os.system('cp -f /etc/hosts ' + dst_path + '/etc/hosts')
+					os.system('rm -rf ' + dst_path + '/lib/modules/*')
+					os.system('cp -rf /lib/modules/* ' + dst_path + '/lib/modules/')
+					os.system('rm -f ' + dst_path + '/boot/*')
+					os.system('cp -f /boot/* ' + dst_path + '/boot/')
+					os.system('rm -rf ' + dst_path + '/usr/share/enigma2/display/*')
+					os.system('cp -rf /usr/share/enigma2/display/* ' + dst_path + '/usr/share/enigma2/display/')
+					os.system('cp -f /usr/share/enigma2/hardware/* ' + dst_path + '/usr/share/enigma2/hardware/')
+				else:
+					return False
 
 		if fileExists('/usr/lib/enigma2/python/boxbranding.so') and not fileExists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
 			os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/enigma2/python/boxbranding.so')

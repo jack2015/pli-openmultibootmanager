@@ -137,27 +137,6 @@ class OMBManagerList(Screen):
 		if self.checkflashImage():
 			self.checktimer.start(2000, True)
 
-	def guessImageTitle(self, base_path, identifier):
-		image_distro = ""
-		image_version = ""
-		e2_path = base_path + '/usr/lib/enigma2/python'
-		if os.path.exists(e2_path + '/boxbranding.so'):
-			helper = os.path.dirname("/usr/bin/python " + os.path.abspath(__file__)) + "/open-multiboot-branding-helper.py"
-			try:
-				fin,fout = os.popen4(helper + " " + e2_path + " image_distro")
-				image_distro = fout.read().strip()
-				fin,fout = os.popen4(helper + " " + e2_path + " image_version")
-				image_version = fout.read().strip()
-			except:
-				fout = os.popen(helper + " " + e2_path + " image_distro")
-				image_distro = fout.read().strip()
-				fout = os.popen(helper + " " + e2_path + " image_version")
-				image_version = fout.read().strip()
-		if len(image_distro) > 0:
-			return image_distro + " " + image_version
-		else:
-			return identifier
-
 	def imageTitleFromLabel(self, file_entry):
 		f = open(self.data_dir + '/' + file_entry)
 		label = f.readline().strip()
@@ -167,8 +146,8 @@ class OMBManagerList(Screen):
 	def populateImagesList(self):
 		self.images_list = []
 		self.images_entries = []
-		flashimageLabel = _('Flash image')
-		self.name = 'flash'
+		flashimageLabel = _('Internal Flash')
+		self.name = 'Internal Flash'
 		next_boot = self.getNextBoot()
 		self["label2"].setText(self.currentImage())
 		if os.path.exists(self.data_dir + '/.label_flash'):
@@ -186,13 +165,11 @@ class OMBManagerList(Screen):
 				if file_entry[0] == '.':
 					continue
 				if not self.isCompatible(self.data_dir + '/' + file_entry):
-					os.system('rm -rf ' + self.data_dir + '/' + file_entry)
-					os.system('rm -f ' + self.data_dir + '/.kernels/' + file_entry + '.bin')
 					continue
 				if os.path.exists(self.data_dir + '/.label_' + file_entry):
 					title = self.imageTitleFromLabel('.label_' + file_entry)
 				else:
-					title = self.guessImageTitle(self.data_dir + '/' + file_entry, file_entry)
+					title = file_entry
 				self.images_entries.append({
 					'label': title,
 					'identifier': file_entry,
@@ -202,7 +179,7 @@ class OMBManagerList(Screen):
 				})
 				if next_boot:
 					if next_boot == file_entry:
-						self.name = title
+						self.name = next_boot
 				count = 0
 				for d in os.listdir(self.data_dir + '/' + file_entry):
 					count += 1
@@ -228,15 +205,15 @@ class OMBManagerList(Screen):
 
 	def getNextBoot(self):
 		try:
-			f = open(self.data_dir + '/.nextboot')
-			boot = f.read()
+			f = open(self.data_dir + '/.nextboot', 'r')
+			boot = f.read().strip()
 			f.close()
 			return boot
 		except:
 			pass
 		try:
-			f = open(self.data_dir + '/.selected')
-			boot = f.read()
+			f = open(self.data_dir + '/.selected', 'r')
+			boot = f.read().strip()
 			f.close()
 			return boot
 		except:
@@ -246,8 +223,8 @@ class OMBManagerList(Screen):
 	def canDeleteEntry(self, entry):
 		selected = 'flash'
 		try:
-			f = open(self.data_dir + '/.selected')
-			selected = f.read()
+			f = open(self.data_dir + '/.selected', 'r')
+			selected = f.read().strip()
 			f.close()
 		except:
 			pass
@@ -258,9 +235,13 @@ class OMBManagerList(Screen):
 	def currentImage(self):
 		selected = 'flash'
 		try:
-			selected = open(self.data_dir + '/.selected').read()
+			f = open(self.data_dir + '/.selected', 'r')
+			selected = f.read().strip()
+			f.close()
 		except:
 			pass
+		if selected == "flash":
+			selected = "Internal Flash"
 		return selected
 
 	def setrcType(self):
@@ -381,29 +362,17 @@ class OMBManagerList(Screen):
 			if os.path.exists(archconffile):
 				with open(archconffile, "r") as arch:
 					for line in arch:
-						b_type = line.split()[1]
-						if running == b_type or running in line:
+						b_type = line.lower().strip()
+						if running in b_type:
 							return True
 							
 			archconffile = "%s/etc/image-version" % base_path
 			if os.path.exists(archconffile):
 				with open(archconffile, "r") as arch:
 					for line in arch:
-						b_type = line.split()[2]
-						if running == b_type or running in line:
+						b_type = line.lower().strip()
+						if running in b_type:
 							return True
-			
-			e2_path = base_path + '/usr/lib/enigma2/python'
-			if os.path.exists(e2_path + '/boxbranding.so'):
-				helper = os.path.dirname("/usr/bin/python " + os.path.abspath(__file__)) + "/open-multiboot-branding-helper.py"
-				try:
-					fin,fout = os.popen4(helper + " " + e2_path + " box_type")
-					b_type = fout.read().strip()
-				except:
-					fout = os.popen(helper + " " + e2_path + " box_type")
-					b_type = fout.read().strip()
-				if running == b_type or running in b_type or b_type in running:
-					return True
 
 		except:
 			pass

@@ -239,6 +239,8 @@ def OMBManager(session, **kwargs):
 			OMBManagerKernelModule(session, kernel_module)
 			return
 
+	if isMounted("/omb") and (not isMounted("/media/mmc")):
+		os.system("mount /omb /media/mmc")
 	data_dir = OMB_MAIN_DIR + '/' + OMB_DATA_DIR
 	if os.path.exists(data_dir):
 		session.open(OMBManagerList, OMB_MAIN_DIR)

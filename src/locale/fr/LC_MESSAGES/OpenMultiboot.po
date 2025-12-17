@@ -1,0 +1,312 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-07-31 12:48+0200\n"
+"PO-Revision-Date: 2018-07-31 12:53+0200\n"
+"Last-Translator: Pr2\n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.1.1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid ""
+" to use openMultiboot\n"
+"Do you want install it?"
+msgstr ""
+" pour utiliser openMultiboot\n"
+"Voulez-vous l’installer?"
+
+msgid "(Folder"
+msgstr "(Répertoire"
+
+msgid "(Folder is empty!) "
+msgstr "(le répertoire est vide!) "
+
+msgid "(Unpack"
+msgstr "(Décompression"
+
+msgid "(Unpack error!) "
+msgstr "(Erreur de décompression!)"
+
+msgid "Add zip archive with image in 'open-multiboot-upload'"
+msgstr "Ajouter l’archive zip avec l’image dans ‘open-multiboot-upload’"
+
+msgid "Alternative name image folder"
+msgstr "Nom alternatif du répertoire de l’image"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Cannot create data folder"
+msgstr "Impossible de créer un répertoire de donnée"
+
+#, python-format
+msgid "Cannot create folder %s"
+msgstr "Impossible de créer le dossier %s"
+
+#, python-format
+msgid "Cannot create kernel folder %s"
+msgstr "Impossible de créer le dossier noyau %s"
+
+#, python-format
+msgid "Cannot create main folder %s"
+msgstr "Impossible de créer le dossier principal %s"
+
+msgid "Cannot create virtual MTD device"
+msgstr "Impossible de créer le périphérique virtuel MTD"
+
+msgid "Cannot deflate image"
+msgstr "Impossible de décompresser l’image"
+
+msgid "Cannot extract nfi image"
+msgstr "Impossible d’extraire l’image nfi"
+
+msgid "Cannot format the device"
+msgstr "Impossible de formater le périphérique"
+
+msgid "Cannot install "
+msgstr "Impossible d’installer"
+
+msgid "Cannot remount the device"
+msgstr "Impossible de monter à nouveau le périphérique"
+
+msgid "Cannot umount the device"
+msgstr "Impossible de démonter le périphérique"
+
+msgid "Choose the image to install"
+msgstr "Choisir l’image a installer"
+
+msgid "Current Running Image:"
+msgstr "Image qui fonctionne actuellement:"
+
+msgid "Delete"
+msgstr "Effacer"
+
+#, python-format
+msgid "Delete folder %s and all file"
+msgstr "Effacer le répertoire %s et les fichiers"
+
+msgid "Disable '/sbin/open_multiboot'"
+msgstr "Désactiver ‘/sbin/open_multiboot’"
+
+msgid "Disable autoscan zip archive at mount device"
+msgstr "Désactiver l’autoscan de l’archive zip et monter le périphérique"
+
+msgid "Disable boot menu"
+msgstr "Désactiver le menu de démarrage"
+
+#, python-format
+msgid "Do you really want add %s with image in 'open-multiboot-upload'?"
+msgstr "Voulez-vous vraiment ajouter %s comme image dans ‘open-multiboot-upload’?"
+
+#, python-format
+msgid "Do you want to delete %s?"
+msgstr "Voulez-vous effacer %s?"
+
+msgid "Do you want to reboot box now ?"
+msgstr "Voulez-vous redémarrer le récepteur maintenant ?"
+
+msgid "Do you want to reboot now ?"
+msgstr "Voulez-vous redémarrer maintenant ?"
+
+msgid "Enable '/sbin/open_multiboot'"
+msgstr "Activer ‘/sbin/open_multiboot’"
+
+msgid "Enable autoscan zip archive at mount device"
+msgstr "Activer l’autoscan de l’archive zip en montant le périphérique"
+
+msgid "Enable boot menu"
+msgstr "Activer le menu de démarrage"
+
+msgid "Error adding zip archive!"
+msgstr "Erreur en ajoutant l’archive zip!"
+
+msgid "Error copying kernel"
+msgstr "Erreur en copiant le noyau"
+
+msgid "Error copying unpacked rootfs"
+msgstr "Erreur lors de la copie du rootfs décompressé"
+
+msgid "Error removing zip archive!"
+msgstr "Erreur en effacant l’archive zip!"
+
+msgid "Error set new timeout!"
+msgstr "Erreur définir un nouveau timeout!"
+
+msgid "Error unpacking rootfs"
+msgstr "Erreur en décompressant le rootfs"
+
+msgid "Exit"
+msgstr "Quitter"
+
+msgid ""
+"Filesystem not supported\n"
+"Do you want format your drive?"
+msgstr ""
+"Système de fichiers non pris en charge\n"
+" \n"
+"Voulez vous formater votre disque?"
+
+msgid "Fix mount devices (for PLi)"
+msgstr "Corriger le point de montage (pour PLi)"
+
+msgid "Flash image"
+msgstr "Image de la mémoire flash"
+
+#, python-format
+msgid ""
+"For this reciever need only first partition muliboot image for use 'openMultiboot'!\n"
+"Current partition muliboot image - %s"
+msgstr ""
+"Ce récepteur n’a besoin que de la première partition de l’image multiboot pour utiliser ‘openMultiboot’!\n"
+"Partition courante de l’image multiboot - %s"
+
+msgid "Generic error in unpaack process"
+msgstr "Erreur générique dans le processus de décompression"
+
+msgid "Incorrect time!"
+msgstr "Heure incorrecte!"
+
+msgid "Install"
+msgstr "Installer"
+
+msgid "Install '/sbin/open_multiboot'"
+msgstr "Installer ‘/sbin/open_multiboot’"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Multi boot loader for enigma2 box"
+msgstr "Chargeur Multi boot pour les récepteurs Enigma2"
+
+#, python-format
+msgid "Next boot: %s"
+msgstr "Démarrage suivant: %s"
+
+msgid "No suitable devices found"
+msgstr "Pas de périphérique approprié trouvé"
+
+msgid "Not found boxbranding.so!"
+msgstr "Pas trouvé boxbranding.so!"
+
+msgid "OMB disabled."
+msgstr "OMB désactivé."
+
+msgid "OMB enabled."
+msgstr "OMB activé."
+
+msgid "Open MultiBoot Menu"
+msgstr "Menu Open MultiBoot"
+
+msgid "Open Multiboot"
+msgstr "Open Multiboot"
+
+msgid "OpenMultiboot"
+msgstr "OpenMultiboot"
+
+msgid "Please enter new name:"
+msgstr "Merci d'entrer un nouveau nom:"
+
+msgid "Please select the necessary option..."
+msgstr "Veuillez sélectionner l’option nécessaire..."
+
+#, python-format
+msgid "Please upload an image inside %s"
+msgstr "S’il vous plaît télécharger une image dans %s"
+
+msgid "Please wait 40 seconds, while delete is in progress."
+msgstr "Veuillez patienter 40 secondes, pendant que l’effacement est en cours."
+
+msgid "Please wait while delete is in progress."
+msgstr "Merci de patienter pendant que l’effacement est en cours."
+
+msgid "Please wait while format is in progress."
+msgstr "Merci de patienter pendant que le formatage est en cours."
+
+msgid "Please wait while installation is in progress."
+msgstr "Merci de patienter pendant que l’installation est en cours."
+
+msgid ""
+"Please wait while installation is in progress.\n"
+"This operation may take a while."
+msgstr ""
+"Merci de patienter pendant que l’installation est en cours.\n"
+"Cette opération peut prendre un certain temps."
+
+msgid "Press OK to next boot."
+msgstr "Appuyer sur OK pour le prochain démarrage."
+
+msgid "Read error current dir, sorry."
+msgstr "Erreur de lecture sur le répertoire courant, désolé."
+
+msgid "Readme"
+msgstr "Lisez moi"
+
+msgid "Rename"
+msgstr "Renommer"
+
+msgid "Set new timeout (sec)"
+msgstr "Définir un nouveau timeout (sec)"
+
+#, python-format
+msgid "Set next boot to %s ?"
+msgstr "Définir le prochain démarrage sur %s ?"
+
+msgid "Standard install"
+msgstr "Installation standard"
+
+#, python-format
+msgid "The folder %s already exist"
+msgstr "Le répertoire %s existe déjà"
+
+#, python-format
+msgid "Timeout boot menu: next %d sec"
+msgstr "Timeout du menu de démarrage: prochain %d sec"
+
+msgid "Use altenative folder"
+msgstr "Utiliser un répertoire alternatif"
+
+msgid ""
+"Warning!\n"
+"'/sbin/open_multiboot' not installed!"
+msgstr ""
+"Attention!\n"
+"‘/sbin/open_multiboot’ n’est pas installé!"
+
+msgid "Where do you want to install openMultiboot?"
+msgstr "Où voulez-vous installer openMultiboot?"
+
+msgid "You need the module "
+msgstr "Vous avez besoin du module "
+
+msgid ""
+"You want to install an alternative kernel-module-nandsim?\n"
+"Linux version may be different from the module!"
+msgstr ""
+"Vous voulez installer un kernel-module-nandsim alternatif?\n"
+"La version de Linux peut être différente de celle du module!"
+
+msgid "Your STB doesn't seem supported"
+msgstr "Votre récepteur ne semble pas supporté"
+
+msgid "openMultiboot About"
+msgstr "À propos d’openMultiboot"
+
+msgid "openMultiboot Install"
+msgstr "Installer openMultiboot"
+
+msgid "openMultiboot Manager"
+msgstr "Gestionnaire d’openMultiboot"
+
+#, python-format
+msgid "zip archive was successfully added to '%s' OMB!"
+msgstr "l’archive zip a été installé avec succès dans ‘%s’ OMB!"

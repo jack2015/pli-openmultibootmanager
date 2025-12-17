@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-
-# Language extension for distutils Python scripts. Based on this concept:
-# http://wiki.maemo.org/Internationalize_a_Python_application
+from __future__ import print_function
 from distutils import cmd
 from distutils.command.build import build as _build
-import glob
-import os
+from os import listdir, system
+from os.path import join, isdir
+
 
 class build_trans(cmd.Command):
 	description = 'Compile .po files into .mo files'
+
 	def initialize_options(self):
 		pass
 
@@ -16,30 +15,25 @@ class build_trans(cmd.Command):
 		pass
 
 	def run(self):
-		s = os.path.join('po')
-		lang_domains = glob.glob(os.path.join(s, '*.pot'))
-		if len(lang_domains):
-			for lang in os.listdir(s):
-				if lang.endswith('.po'):
-					src = os.path.join(s, lang)
-					lang = lang[:-3]
-					destdir = os.path.join('build', 'lib', 'Extensions',
-						'OpenMultiboot', 'locale', lang, 'LC_MESSAGES')
-					if not os.path.exists(destdir):
-						os.makedirs(destdir)
-					for lang_domain in lang_domains:
-						lang_domain = lang_domain.rsplit('/', 1)[1]
-						dest = os.path.join(destdir, lang_domain[:-3] + 'mo')
+		s = join('src', 'locale')
+		for lang in listdir(s):
+			lc = join(s, lang, 'LC_MESSAGES')
+			if isdir(lc):
+				for f in listdir(lc):
+					if f.endswith('.po'):
+						src = join(lc, f)
+						dest = join(lc, f[:-2] + 'mo')
 						print("Language compile %s -> %s" % (src, dest))
-						if os.system("msgfmt '%s' -o '%s'" % (src, dest)) != 0:
-							raise Exception("Failed to compile: " + src)
-		else:
-			print("we got no domain -> no translation was compiled")
+						if system("msgfmt '%s' -o '%s'" % (src, dest)) != 0:
+							raise (Exception, "Failed to compile: " + src)
+
 
 class build(_build):
 	sub_commands = _build.sub_commands + [('build_trans', None)]
+
 	def run(self):
 		_build.run(self)
+
 
 cmdclass = {
 	'build': build,

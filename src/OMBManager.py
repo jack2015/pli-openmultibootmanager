@@ -240,6 +240,8 @@ def OMBManager(session, **kwargs):
 			return
 
 	if isMounted("/omb") and (not isMounted("/media/mmc")):
+		if not os.path.exists("/media/mmc"):
+			os.system("mkdir -p /media/mmc")
 		os.system("mount /omb /media/mmc")
 	data_dir = OMB_MAIN_DIR + '/' + OMB_DATA_DIR
 	if os.path.exists(data_dir):

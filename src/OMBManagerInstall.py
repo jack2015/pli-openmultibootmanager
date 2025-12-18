@@ -512,6 +512,9 @@ class OMBManagerInstall(Screen):
 						if self.afterInstallImage(target_folder):
 							os.system(OMB_RM_BIN + ' -f ' + source_file)
 							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+							f = open(datafile_dir + '.timer', "w")
+							f.write("10")
+							f.close()
 							self.messagebox.close()
 							self.close(target_folder)
 						else:
@@ -644,17 +647,6 @@ class OMBManagerInstall(Screen):
 			self.showError(_("Your STB doesn\'t seem supported"))
 			return False
 
-	def isMounted(self, device):
-		try:
-			with open("/proc/mounts","r") as fp:
-				for line in fp.readlines():
-					if device in line:
-						return True
-						break
-		except:
-			pass
-		return False
-
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
 		if not os.path.exists(dst_path + "/sbin"):
@@ -671,22 +663,9 @@ class OMBManagerInstall(Screen):
 				return False
 
 		if self.compat_dm800se and (BOX_NAME == "dm800se"):
-			os.system('cp -f /etc/hostname ' + dst_path + '/etc/hostname')
-			os.system('cp -f /etc/hosts ' + dst_path + '/etc/hosts')
 			os.system('rm -rf ' + dst_path + '/lib/modules/*')
 			os.system('cp -rf /lib/modules/* ' + dst_path + '/lib/modules/')
-			if not self.isMounted("/boot"):
-				if not os.path.exists("/boot"):
-					os.system("mkdir /boot")
-				os.system("mount -t jffs2 /dev/mtdblock2 /boot")
-			if self.isMounted("/boot"):
-				os.system('rm -f ' + dst_path + '/boot/*')
-				os.system('cp -f /boot/* ' + dst_path + '/boot/')
 			os.system('ln -sf vmlinux-3.2-dm800se ' + dst_path + '/boot/vmlinux')
-			os.system('rm -rf ' + dst_path + '/usr/share/enigma2/display/*')
-			os.system('cp -rf /usr/share/enigma2/display/* ' + dst_path + '/usr/share/enigma2/display/')
-			if fileExists(dst_path + '/usr/share/enigma2/hardware/'):
-				os.system('cp -f /usr/share/enigma2/hardware/* ' + dst_path + '/usr/share/enigma2/hardware/')
 
 		if fileExists('/usr/lib/enigma2/python/boxbranding.so') and not fileExists(dst_path + '/usr/lib/enigma2/python/boxbranding.so'):
 			os.system('cp -f /usr/lib/enigma2/python/boxbranding.so ' + dst_path + '/usr/lib/enigma2/python/boxbranding.so')

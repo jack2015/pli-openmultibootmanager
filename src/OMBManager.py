@@ -239,7 +239,7 @@ def OMBManager(session, **kwargs):
 			OMBManagerKernelModule(session, kernel_module)
 			return
 
-	if isMounted("/omb") and (not isMounted("/media/mmc")):
+	if isMounted("/omb") and isMounted("/dev/mmcblk1p1") and (not isMounted("/media/mmc")):
 		if not os.path.exists("/media/mmc"):
 			os.system("mkdir -p /media/mmc")
 		os.system("mount /omb /media/mmc")

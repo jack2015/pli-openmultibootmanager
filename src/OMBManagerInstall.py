@@ -368,8 +368,8 @@ class OMBManagerInstall(Screen):
 		elif BOX_NAME == "dm920":
 			menu.append((_("Compatible install Use DM900 firmware"), "compat_dm9x0"))
 		elif BOX_NAME == "dm800se":
-			menu.append((_("Compatible Mode"), "compat_dm800se"))
-			menu.append((_("Install with clone patch"), "dm800seclone"))
+			menu.append((_("Compatible install"), "compat_dm800se"))
+			menu.append((_("Install with sim clone patch"), "dm800seclone"))
 		def setAction(choice):
 			if choice:
 				if choice[1] == "standard":
@@ -644,6 +644,17 @@ class OMBManagerInstall(Screen):
 			self.showError(_("Your STB doesn\'t seem supported"))
 			return False
 
+	def isMounted(self, device):
+		try:
+			with open("/proc/mounts","r") as fp:
+				for line in fp.readlines():
+					if device in line:
+						return True
+						break
+		except:
+			pass
+		return False
+
 	def afterInstallImage(self, dst_path=""):
 		dst_path = dst_path.rstrip("/")
 		if not os.path.exists(dst_path + "/sbin"):
@@ -664,13 +675,14 @@ class OMBManagerInstall(Screen):
 			os.system('cp -f /etc/hosts ' + dst_path + '/etc/hosts')
 			os.system('rm -rf ' + dst_path + '/lib/modules/*')
 			os.system('cp -rf /lib/modules/* ' + dst_path + '/lib/modules/')
-			if not isMounted("/boot"):
+			if not self.isMounted("/boot"):
 				if not os.path.exists("/boot"):
 					os.system("mkdir /boot")
 				os.system("mount -t jffs2 /dev/mtdblock2 /boot")
-			if isMounted("/boot"):
+			if self.isMounted("/boot"):
 				os.system('rm -f ' + dst_path + '/boot/*')
 				os.system('cp -f /boot/* ' + dst_path + '/boot/')
+			os.system('ln -sf vmlinux-3.2-dm800se ' + dst_path + '/boot/vmlinux')
 			os.system('rm -rf ' + dst_path + '/usr/share/enigma2/display/*')
 			os.system('cp -rf /usr/share/enigma2/display/* ' + dst_path + '/usr/share/enigma2/display/')
 			if fileExists(dst_path + '/usr/share/enigma2/hardware/'):
@@ -740,17 +752,6 @@ class OMBManagerInstall(Screen):
 			os.system(OMB_RM_BIN + ' -rf ' + dst_path + '/lib/modules/3.2-dm800se/extra')
 			os.system(OMB_TAR_BIN + ' xJf %s -C %s' % (self.dream_path, dst_path))
 		return True
-
-	def isMounted(device):
-		try:
-			with open("/proc/mounts","r") as fp:
-				for line in fp.readlines():
-					if device in line:
-						return True
-						break
-		except:
-			pass
-		return False
 
 	def afterLoadpatchInstalldm900(self):
 		if not fileExists(self.dream_path):

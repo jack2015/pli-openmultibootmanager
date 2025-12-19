@@ -690,7 +690,10 @@ class OMBManagerInstall(Screen):
 					os.system('cp -f /boot/* ' + dst_path + '/boot/')
 					os.system('rm -rf ' + dst_path + '/usr/share/enigma2/display/*')
 					os.system('cp -rf /usr/share/enigma2/display/* ' + dst_path + '/usr/share/enigma2/display/')
-					os.system('cp -f /usr/share/enigma2/hardware/* ' + dst_path + '/usr/share/enigma2/hardware/')
+					if os.path.exists('/usr/share/enigma2/hardware') and os.path.exists(dst_path + '/usr/share/enigma2/hardware'):
+						os.system('cp -f /usr/share/enigma2/hardware/* ' + dst_path + '/usr/share/enigma2/hardware/')
+					f = open(dst_path + '/etc/.compatible', "w")
+					f.close()
 				else:
 					return False
 

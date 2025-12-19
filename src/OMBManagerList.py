@@ -149,7 +149,10 @@ class OMBManagerList(Screen):
 		flashimageLabel = _('Internal Flash')
 		self.name = 'Internal Flash'
 		next_boot = self.getNextBoot()
-		self["label2"].setText(self.currentImage())
+		if os.path.exists('/etc/.compatible'):
+			self["label2"].setText('compatible mode -- ' + self.currentImage())
+		else:
+			self["label2"].setText(self.currentImage())
 		if os.path.exists(self.data_dir + '/.label_flash'):
 			flashimageLabel = self.imageTitleFromLabel('.label_flash') + ' (Flash)'
 		self.images_entries.append({

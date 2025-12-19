@@ -704,6 +704,7 @@ class OMBManagerInstall(Screen):
 		os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py ' + dst_path + '/sbin/open-multiboot-branding-helper.py')
 		os.system("sed -i -e '/mtdblock2/d' " + dst_path + "/etc/fstab")
 		os.system("sed -i -e '/mmcblk0p3/d' " + dst_path + "/etc/fstab")
+		os.system('rm -rf ' + dst_path + '/tmp/*')
 
 		fix = False
 		error = False

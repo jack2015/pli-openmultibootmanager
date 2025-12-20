@@ -532,7 +532,7 @@ class OMBManagerList(Screen):
 
 				elif choice[1] == "kernel":
 					if os.system("/usr/bin/mount-boot.sh") == 0:
-						os.system("cp " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz')
+						os.system("cp -f " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz')
 						os.system("umount /boot")
 						self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
 					else:

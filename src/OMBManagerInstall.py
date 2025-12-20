@@ -521,9 +521,17 @@ class OMBManagerInstall(Screen):
 							os.system(OMB_RM_BIN + ' -f ' + target_folder + '/boot/*')
 							os.system(OMB_RM_BIN + ' -f ' + source_file)
 							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-							if os.system("/usr/bin/mount-boot.sh") == 0:
-								os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
-								os.system("umount /boot")
+							if not fileExists(self.check_kernel_file):
+								if os.system("/usr/bin/mount-boot.sh") == 0:
+									os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+									os.system("umount /boot")
+							else:
+								if os.system("/usr/bin/mount-boot.sh") == 0:
+									if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
+										#os.system("rm -f " + self.check_kernel_file)
+										self.showError(_("Install ok but internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."))
+										return
+									os.system("umount /boot")
 							f = open(datafile_dir + '.timer', "w")
 							f.write("10")
 							f.close()
@@ -635,9 +643,17 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -f ' + target_folder + '/boot/*')
 				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
-				if os.system("/usr/bin/mount-boot.sh") == 0:
-					os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
-					os.system("umount /boot")
+				if not fileExists(self.check_kernel_file):
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+						os.system("umount /boot")
+				else:
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
+							#os.system("rm -f " + self.check_kernel_file)
+							self.showError(_("Install ok but internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."))
+							return
+						os.system("umount /boot")
 				f = open(datafile_dir + '.timer', "w")
 				f.write("10")
 				f.close()
@@ -727,6 +743,7 @@ class OMBManagerInstall(Screen):
 		os.system("sed -i -e '/mtdblock2/d' " + dst_path + "/etc/fstab")
 		os.system("sed -i -e '/mmcblk0p3/d' " + dst_path + "/etc/fstab")
 		os.system('rm -rf ' + dst_path + '/tmp/*')
+		os.system("cp -f /usr/bin/mount-boot.sh " + dst_path + "/usr/bin/mount-boot.sh")
 
 		fix = False
 		error = False

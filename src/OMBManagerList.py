@@ -104,6 +104,7 @@ class OMBManagerList(Screen):
 		self.mount_point = mount_point
 		self.data_dir = mount_point + '/' + OMB_DATA_DIR
 		self.upload_dir = mount_point + '/' + OMB_UPLOAD_DIR
+		self.check_kernel_file = self.data_dir + "/.kernels/flash.bin"
 		self.select = None
 		self["label1"] = Label(_("Current Running Image:"))
 		self["label2"] = Label("")
@@ -449,7 +450,8 @@ class OMBManagerList(Screen):
 			return
 		text = _("Please select the necessary option...")
 		menu = [(_("Readme"), "readme")]
-		menu.append((_("Flash kernel immediately - Gain better compatibility"), "kernel"))
+		if not self.checkflashImage():
+			menu.append((_("Flash kernel immediately - Gain better compatibility"), "kernel"))
 		if self.checkflashImage():
 			if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd" or BOX_NAME == "h7" or BOX_NAME == "gbquad4k" or BOX_NAME == "gbue4k":
 				mount_part = os.popen("readlink /dev/root").read()
@@ -499,8 +501,7 @@ class OMBManagerList(Screen):
 			else:
 				menu.append((_("Enable boot with flash kernel"), "bootflashenable"))
 
-
-			menu.append((_("Alternative name image folder") + ": %s" % config.plugins.omb.alternative_image_folder.value, "folder"))
+			menu.append((_("Restore internal flash kernel from kernel.bin"), "restorekernel"))
 		if not self.checkMountFix():
 			menu.append((_("Fix mount devices (for PLi)"), "fix_mount"))
 		def extraAction(choice):
@@ -515,6 +516,14 @@ class OMBManagerList(Screen):
 						self.refresh()
 
 				elif choice[1] == "bootflashenable":
+					if not fileExists(self.check_kernel_file):
+						self.session.open(MessageBox,_("flash.bin in directory of open-multiboot is not find") + " !", MessageBox.TYPE_INFO)
+						return
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
+							self.session.open(MessageBox,_("Internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."), MessageBox.TYPE_INFO)
+							return
+						os.system("umount /boot")
 					if not os.path.isfile(self.data_dir + '/.bootflash.unlock'):
 						cmd = "touch " + self.data_dir + '/.bootflash.unlock'
 						os.system(cmd)
@@ -530,11 +539,28 @@ class OMBManagerList(Screen):
 					os.system('rm -f ' + file_entry1)
 					self.refresh()
 
+				elif choice[1] == "restorekernel":
+					if not os.path.isfile(self.upload_dir + "/kernel.bin"):
+						self.session.open(MessageBox,_("Kernel.bin in directory of open-multiboot-upload is not find") + " !", MessageBox.TYPE_INFO)
+						return
+					os.system("cp -f " + self.upload_dir + "/kernel.bin " + self.data_dir + "/.kernels/flash.bin")
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						if os.system("cp -f " + self.upload_dir + "/kernel.bin /boot/vmlinux-3.2-dm800se.gz") == 0:
+							self.session.open(MessageBox,_("Restore kernel successed") + " !", MessageBox.TYPE_INFO)
+						else:
+							self.session.open(MessageBox,_("Restore kernel not successed") + " !", MessageBox.TYPE_INFO)
+						os.system("umount /boot")
+						os.system("rm -f " + self.upload_dir + "/kernel.bin")
+					else:
+						self.session.open(MessageBox,_("Restore kernel not successed") + " !", MessageBox.TYPE_INFO)
+
 				elif choice[1] == "kernel":
 					if os.system("/usr/bin/mount-boot.sh") == 0:
-						os.system("cp -f " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz')
+						if os.system("cp -f " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz') == 0:
+							self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
+						else:
+							self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
 						os.system("umount /boot")
-						self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
 					else:
 						self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
 

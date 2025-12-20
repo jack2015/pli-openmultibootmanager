@@ -516,7 +516,7 @@ class OMBManagerList(Screen):
 						self.refresh()
 
 				elif choice[1] == "bootflashenable":
-					if not fileExists(self.check_kernel_file):
+					if not os.path.isfile(self.check_kernel_file):
 						self.session.open(MessageBox,_("flash.bin in directory of open-multiboot is not find") + " !", MessageBox.TYPE_INFO)
 						return
 					if os.system("/usr/bin/mount-boot.sh") == 0:

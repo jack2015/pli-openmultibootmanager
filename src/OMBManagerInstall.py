@@ -528,7 +528,6 @@ class OMBManagerInstall(Screen):
 							else:
 								if os.system("/usr/bin/mount-boot.sh") == 0:
 									if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
-										#os.system("rm -f " + self.check_kernel_file)
 										self.showError(_("Install ok but internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."))
 										return
 									os.system("umount /boot")
@@ -650,7 +649,6 @@ class OMBManagerInstall(Screen):
 				else:
 					if os.system("/usr/bin/mount-boot.sh") == 0:
 						if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
-							#os.system("rm -f " + self.check_kernel_file)
 							self.showError(_("Install ok but internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."))
 							return
 						os.system("umount /boot")
@@ -743,7 +741,7 @@ class OMBManagerInstall(Screen):
 		os.system("sed -i -e '/mtdblock2/d' " + dst_path + "/etc/fstab")
 		os.system("sed -i -e '/mmcblk0p3/d' " + dst_path + "/etc/fstab")
 		os.system('rm -rf ' + dst_path + '/tmp/*')
-		os.system("cp -f /usr/bin/mount-boot.sh " + dst_path + "/usr/bin/mount-boot.sh")
+		os.system("cp -pf /usr/bin/mount-boot.sh " + dst_path + "/usr/bin/mount-boot.sh")
 
 		fix = False
 		error = False

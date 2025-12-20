@@ -322,6 +322,7 @@ class OMBManagerInstall(Screen):
 		self.dm800se_clone_install = False
 		self.compat_dm9x0 = False
 		self.compat_dm800se = False
+		self.check_kernel_file = ""
 		self.dream_path = ""
 		self['info'] = Label(_("Choose the image to install"))
 		self["list"] = List(upload_list)
@@ -396,6 +397,7 @@ class OMBManagerInstall(Screen):
 
 		patch_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch'
 		loadScript = "/usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/install-nandsim.sh"
+		self.check_kernel_file = self.mount_point + '/' + OMB_DATA_DIR + '/.kernels/flash.bin'
 
 		if self.dm900_clone_install and BOX_NAME == "dm900":
 			dm900_path = self.mount_point + '/' + OMB_DATA_DIR + '/.patch/dm900-patch.tar.xz'
@@ -510,8 +512,18 @@ class OMBManagerInstall(Screen):
 						os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
 					else:
 						if self.afterInstallImage(target_folder):
+							if not self.compat_dm800se:
+								os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux-3.2-dm800se.gz ' + kernel_target_file)
+							else:
+								if os.system("/usr/bin/mount-boot.sh") == 0:
+									os.system(OMB_CP_BIN + ' ' + '/boot/vmlinux-3.2-dm800se.gz ' + kernel_target_file)
+									os.system("umount /boot")
+							os.system(OMB_RM_BIN + ' -f ' + target_folder + '/boot/*')
 							os.system(OMB_RM_BIN + ' -f ' + source_file)
 							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+							if os.system("/usr/bin/mount-boot.sh") == 0:
+								os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+								os.system("umount /boot")
 							f = open(datafile_dir + '.timer', "w")
 							f.write("10")
 							f.close()
@@ -614,8 +626,18 @@ class OMBManagerInstall(Screen):
 
 		elif "tar.bz2" in OMB_GETIMAGEFILESYSTEM:
 			if self.installImageTARBZ2(tmp_folder, target_folder, kernel_target_file, tmp_folder):
+				if not self.compat_dm800se:
+					os.system(OMB_CP_BIN + ' ' + target_folder + '/boot/vmlinux-3.2-dm800se.gz ' + kernel_target_file)
+				else:
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						os.system(OMB_CP_BIN + ' ' + '/boot/vmlinux-3.2-dm800se.gz ' + kernel_target_file)
+						os.system("umount /boot")
+				os.system(OMB_RM_BIN + ' -f ' + target_folder + '/boot/*')
 				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				if os.system("/usr/bin/mount-boot.sh") == 0:
+					os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+					os.system("umount /boot")
 				f = open(datafile_dir + '.timer', "w")
 				f.write("10")
 				f.close()

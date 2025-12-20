@@ -244,6 +244,16 @@ class OMBManagerList(Screen):
 			selected = "Internal Flash"
 		return selected
 
+	def currentrunimage(self):
+		selected = 'flash'
+		try:
+			f = open(self.data_dir + '/.selected', 'r')
+			selected = f.read().strip()
+			f.close()
+		except:
+			pass
+		return selected
+
 	def setrcType(self):
 		if self.checkflashImage() and os.path.exists('/proc/stb/ir/rc/type') and os.path.exists('/proc/stb/info/boxtype') and (BOX_NAME != "et8500" and not BOX_NAME.startswith('et7')):
 			file_entry = self.data_dir + '/.rctype'
@@ -439,7 +449,7 @@ class OMBManagerList(Screen):
 			return
 		text = _("Please select the necessary option...")
 		menu = [(_("Readme"), "readme")]
-		#menu.append((_("Flash kernel immediately - Gain better compatibility"), "kernel"))
+		menu.append((_("Flash kernel immediately - Gain better compatibility"), "kernel"))
 		if self.checkflashImage():
 			if BOX_NAME == "hd51" or BOX_NAME == "vs1500" or BOX_NAME == "e4hd" or BOX_NAME == "h7" or BOX_NAME == "gbquad4k" or BOX_NAME == "gbue4k":
 				mount_part = os.popen("readlink /dev/root").read()
@@ -484,10 +494,10 @@ class OMBManagerList(Screen):
 				name_text = _("Timeout boot menu: next %d sec") % current_value
 				menu.append((name_text, "timeout"))
 
-			#if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
-				#menu.append((_("Disable boot with flash kernel"), "bootflashdisable"))
-			#else:
-				#menu.append((_("Enable boot with flash kernel"), "bootflashenable"))
+			if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+				menu.append((_("Disable boot with flash kernel"), "bootflashdisable"))
+			else:
+				menu.append((_("Enable boot with flash kernel"), "bootflashenable"))
 
 
 			menu.append((_("Alternative name image folder") + ": %s" % config.plugins.omb.alternative_image_folder.value, "folder"))
@@ -497,16 +507,18 @@ class OMBManagerList(Screen):
 			if choice:
 				if choice[1] == "readme":
 					self.session.open(Console,_("Readme"),["cat /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/readme"])
-				#elif choice[1] == "bootflashdisable":
-					#if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
-						#file_entry = self.data_dir + '/.bootflash.unlock'
-						#os.system('rm ' + file_entry)
-						#self.refresh()
-				#elif choice[1] == "bootflashenable":
-					#if not os.path.isfile(self.data_dir + '/.bootflash.unlock'):
-						#cmd = "touch " + self.data_dir + '/.bootflash.unlock'
-						#os.system(cmd)
-						#self.refresh()
+
+				elif choice[1] == "bootflashdisable":
+					if os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+						file_entry = self.data_dir + '/.bootflash.unlock'
+						os.system('rm -f ' + file_entry)
+						self.refresh()
+
+				elif choice[1] == "bootflashenable":
+					if not os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+						cmd = "touch " + self.data_dir + '/.bootflash.unlock'
+						os.system(cmd)
+						self.refresh()
 
 				elif choice[1] == "disable":
 					os.system('rm -f /sbin/init')
@@ -518,11 +530,13 @@ class OMBManagerList(Screen):
 					os.system('rm -f ' + file_entry1)
 					self.refresh()
 
-				#elif choice[1] == "kernel":
-					#if os.system('/usr/sbin/flash-kernel /boot/zImage-3.14-1.17-' +BOX_NAME) == 0:
-						#self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
-					#else:
-						#self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
+				elif choice[1] == "kernel":
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						os.system("cp " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz')
+						os.system("umount /boot")
+						self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
+					else:
+						self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
 
 				elif choice[1] == "enable":
 					if not self.checkMountFix():
@@ -533,8 +547,10 @@ class OMBManagerList(Screen):
 						os.system('ln -sf /sbin/open_multiboot /sbin/init')
 						os.system('cp -f /usr/lib/enigma2/python/Plugins/Extensions/OpenMultiboot/open-multiboot-branding-helper.py /sbin/open-multiboot-branding-helper.py')
 						self.refresh()
+
 				elif choice[1] == "delete":
 					self.session.openWithCallback(self.deleteAnswer, MessageBox, _("Do you want to delete %s?") % (self.data_dir + '/'), MessageBox.TYPE_YESNO)
+
 				elif choice[1] == "fix_mount":
 					for line in fileinput.input('/etc/init.d/volatile-media.sh', inplace=True):
 						if 'mount -t tmpfs -o size=64k tmpfs /media' in line:
@@ -544,16 +560,21 @@ class OMBManagerList(Screen):
 					if self.checkMountFix():
 						if not self.session.nav.getRecordings() and self.checkStatusOMB() == _('OMB enabled.'):
 							self.session.openWithCallback(self.confirmRebootCB, MessageBox,_('Do you want to reboot box now ?'), MessageBox.TYPE_YESNO, default=False)
+
 				elif choice[1] == "enablescan":
 					self.setAutoScan(choice[1])
+
 				elif choice[1] == "disablescan":
 					self.setAutoScan(choice[1])
+
 				elif choice[1] == "timeout":
 					self.changeTimeout(current_value)
+
 				elif choice[1] == "multiboot":
 					cmd = "opkg install --force-reinstall openmultiboot"
 					text = _("Install")
 					self.session.open(Console, text, [cmd])
+
 				elif choice[1] == "folder":
 					self.session.openWithCallback(self.renameFolderCallback, VirtualKeyBoard, title = _("Please enter new name:"), text=config.plugins.omb.alternative_image_folder.value)
 		dlg = self.session.openWithCallback(extraAction, ChoiceBox, title=text, list=menu)

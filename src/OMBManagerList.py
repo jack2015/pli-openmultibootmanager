@@ -564,6 +564,9 @@ class OMBManagerList(Screen):
 							os.system("umount /boot")
 							return
 						if os.system("cp -f " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz') == 0:
+							if not os.path.isfile(self.data_dir + '/.bootflash.unlock'):
+								cmd = "touch " + self.data_dir + '/.bootflash.unlock'
+								os.system(cmd)
 							self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
 						else:
 							self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)

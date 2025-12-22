@@ -450,6 +450,7 @@ class OMBManagerList(Screen):
 			return
 		text = _("Please select the necessary option...")
 		menu = [(_("Readme"), "readme")]
+		menu.append((_("Show file size of interal bootloader kernel"), "cmpkernel"))
 		if not self.checkflashImage():
 			menu.append((_("Flash kernel immediately - Gain better compatibility"), "kernel"))
 		if self.checkflashImage():
@@ -556,6 +557,12 @@ class OMBManagerList(Screen):
 
 				elif choice[1] == "kernel":
 					if os.system("/usr/bin/mount-boot.sh") == 0:
+						internal_kernel_size = str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz"))
+						backup_kernel_size = str(os.path.getsize(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'))
+						if internal_kernel_size == backup_kernel_size :
+							self.session.open(MessageBox,_("No need to refresh the kernel") + " !", MessageBox.TYPE_INFO)
+							os.system("umount /boot")
+							return
 						if os.system("cp -f " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz') == 0:
 							self.session.open(MessageBox,_("Flash kernel successed") + " !", MessageBox.TYPE_INFO)
 						else:
@@ -563,6 +570,18 @@ class OMBManagerList(Screen):
 						os.system("umount /boot")
 					else:
 						self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
+
+				elif choice[1] == "cmpkernel":
+					if os.system("/usr/bin/mount-boot.sh") == 0:
+						internal_kernel_size = str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz"))
+						backup_kernel_size = str(os.path.getsize(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'))
+						if internal_kernel_size == backup_kernel_size:
+							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nIt is same, perfect operation", MessageBox.TYPE_INFO)
+						else:
+							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nIt isn't same, maybe you will encounter some issues", MessageBox.TYPE_INFO)
+						os.system("umount /boot")
+					else:
+						self.session.open(MessageBox,_("Something is wrong") + " !", MessageBox.TYPE_INFO)
 
 				elif choice[1] == "enable":
 					if not self.checkMountFix():

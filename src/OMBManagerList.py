@@ -608,10 +608,7 @@ class OMBManagerList(Screen):
 					if os.system("/usr/bin/mount-boot.sh") == 0:
 						internal_kernel_size = str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz"))
 						backup_kernel_size = str(os.path.getsize(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'))
-						if internal_kernel_size == backup_kernel_size:
-							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nBackup kernel of internal : " + size + "\nIt is same, perfect operation", MessageBox.TYPE_INFO)
-						else:
-							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nBackup kernel of internal : " + size + "\nIt isn't same, maybe you will encounter some issues", MessageBox.TYPE_INFO)
+						self.session.open(MessageBox, "Kernel of Internal Boot: " + internal_kernel_size + "\nKernel of Current Image: " + backup_kernel_size + "\n----------------------------------\nkernel of Main Image: " + size, MessageBox.TYPE_INFO)
 						os.system("umount /boot")
 					else:
 						self.session.open(MessageBox,_("Something is wrong") + " !", MessageBox.TYPE_INFO)

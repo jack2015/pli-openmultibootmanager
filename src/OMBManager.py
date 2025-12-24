@@ -56,8 +56,14 @@ class OMBManagerInit:
 				else:
 					disks_list.append((_('Find unknown device. Please reboot machine'), None))
 
-		if (fd1 == False) and isMounted("/media/mmcblk1p1"):
-			os.system("mount /dev/mmcblk1p1 /media/mmc")
+		if (fd1 == False) and isMounted("/media/mmcblk1p1") and (not isMounted("/media/mmc")):
+			if not os.path.exists("/media/mmc"):
+				os.system("mkdir -p /media/mmc")
+			fstp = self.getFSType("mmcblk1p1")
+			if fstp == "none":
+				os.system("mount /dev/mmcblk1p1 /media/mmc")
+			else:
+				os.system("mount -t " + fstp + " /dev/mmcblk1p1 /media/mmc")
 
 		if disks_list is not None:
 			disks_list.append((_("Cancel"), None))
@@ -227,7 +233,7 @@ def OMBManager(session, **kwargs):
 		# When use nfidump
 		if BOX_MODEL == "dreambox":
 			kernel_module = None
-			if BOX_NAME == "dm500hd" or BOX_NAME == "dm800" or BOX_NAME == "dm800se" or BOX_NAME == "dm7020hd" or BOX_NAME == "dm7020hdv2" or BOX_NAME == "dm8000" or BOX_NAME == "dm500hdv2" or BOX_NAME == "dm800sev2":
+			if BOX_NAME in ("dm800", "dm500hd", "dm800se", "dm7020hd", "dm7020hdv2", "dm8000", "dm500hdv2", "dm800sev2"):
 				if not os.path.exists(OMB_NFIDUMP_BIN):
 					OMBManagerKernelModule(session, "nfidump")
 					return
@@ -242,7 +248,11 @@ def OMBManager(session, **kwargs):
 	if isMounted("/omb") and isMounted("/dev/mmcblk1p1") and (not isMounted("/media/mmc")):
 		if not os.path.exists("/media/mmc"):
 			os.system("mkdir -p /media/mmc")
-		os.system("mount /omb /media/mmc")
+		fstp = getsystype("mmcblk1p1")
+		if fstp == "none":
+			os.system("mount /dev/mmcblk1p1 /media/mmc")
+		else:
+			os.system("mount -t " + fstp + " /dev/mmcblk1p1 /media/mmc")
 	data_dir = OMB_MAIN_DIR + '/' + OMB_DATA_DIR
 	if os.path.exists(data_dir):
 		session.open(OMBManagerList, OMB_MAIN_DIR)
@@ -263,10 +273,25 @@ def OMBManager(session, **kwargs):
 
 def isMounted(device):
 	try:
-		for line in open("/proc/mounts","r").readlines():
-			if device in line:
-				return True
-				break
+		with open("/proc/mounts",'r') as fp:
+			for line in fp:
+				if device in line:
+					return True
+					break
 	except:
 		pass
 	return False
+
+def getsystype(device):
+	try:
+		fin,fout = os.popen4("mount | cut -f 1,5 -d ' '")
+		tmp = fout.read().strip()
+	except:
+		fout = os.popen("mount | cut -f 1,5 -d ' '")
+		tmp = fout.read().strip()
+	for line in tmp.split('\n'):
+		parts = line.split(' ')
+		if len(parts) == 2:
+			if parts[0] == '/dev/' + device:
+				return parts[1]
+	return  "none"

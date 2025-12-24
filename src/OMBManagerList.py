@@ -448,6 +448,7 @@ class OMBManagerList(Screen):
 	def keyExtra(self):
 		if self.checktimer.isActive():
 			return
+		size = ""
 		text = _("Please select the necessary option...")
 		menu = [(_("Readme"), "readme")]
 		menu.append((_("Show file size of interal bootloader kernel"), "cmpkernel"))
@@ -544,6 +545,15 @@ class OMBManagerList(Screen):
 					if not os.path.isfile(self.upload_dir + "/kernel.bin"):
 						self.session.open(MessageBox,_("Kernel.bin in directory of open-multiboot-upload is not find") + " !", MessageBox.TYPE_INFO)
 						return
+					if os.path.isfile("/etc/.kernel_size"):
+						with open("/etc/.kernel_size","r") as fp:
+							size = fp.readline().strip()
+					if size == "":
+						self.session.open(MessageBox,_("Restore kernel not successed") + " !", MessageBox.TYPE_INFO)
+						return
+					if str(os.path.getsize(self.upload_dir + "/kernel.bin")) != size:
+						self.session.open(MessageBox,_("Kernel.bin in directory of open-multiboot-upload is wrong file") + " !", MessageBox.TYPE_INFO)
+						return
 					os.system("cp -f " + self.upload_dir + "/kernel.bin " + self.data_dir + "/.kernels/flash.bin")
 					if os.system("/usr/bin/mount-boot.sh") == 0:
 						if os.system("cp -f " + self.upload_dir + "/kernel.bin /boot/vmlinux-3.2-dm800se.gz") == 0:
@@ -556,11 +566,22 @@ class OMBManagerList(Screen):
 						self.session.open(MessageBox,_("Restore kernel not successed") + " !", MessageBox.TYPE_INFO)
 
 				elif choice[1] == "kernel":
-					if os.system("/usr/bin/mount-boot.sh") == 0:
+					if not os.path.isfile(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'):
+						self.session.open(MessageBox,_("Backup kernel of firmware not find\nYou can:\nRestore it from kernel.bin") + " !", MessageBox.TYPE_INFO)
+						return
+					if os.path.isfile("/etc/.kernel_size"):
+						with open("/etc/.kernel_size","r") as fp:
+							size = fp.readline().strip()
+					if os.system("/usr/bin/mount-boot.sh") == 0 and size != "":
 						internal_kernel_size = str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz"))
 						backup_kernel_size = str(os.path.getsize(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'))
+						backup_flash_kernel_size = str(os.path.getsize(self.data_dir + '/.kernels/flash.bin'))
 						if internal_kernel_size == backup_kernel_size :
 							self.session.open(MessageBox,_("No need to refresh the kernel") + " !", MessageBox.TYPE_INFO)
+							os.system("umount /boot")
+							return
+						if backup_flash_kernel_size != size:
+							self.session.open(MessageBox,_("Backup kernel of internal flash is wrong\nYou can:\nRestore it from kernel.bin") + " !", MessageBox.TYPE_INFO)
 							os.system("umount /boot")
 							return
 						if os.system("cp -f " + self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin /boot/vmlinux-3.2-dm800se.gz') == 0:
@@ -575,13 +596,22 @@ class OMBManagerList(Screen):
 						self.session.open(MessageBox,_("Flash kernel not successed") + " !", MessageBox.TYPE_INFO)
 
 				elif choice[1] == "cmpkernel":
+					if not os.path.isfile(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'):
+						self.session.open(MessageBox,_("Backup kernel of firmware not find\nYou can:\nRestore it from kernel.bin") + " !", MessageBox.TYPE_INFO)
+						return
+					if os.path.isfile("/etc/.kernel_size"):
+						with open("/etc/.kernel_size","r") as fp:
+							size = fp.readline().strip()
+					if size == "":
+						self.session.open(MessageBox,_("Something is wrong") + " !", MessageBox.TYPE_INFO)
+						return
 					if os.system("/usr/bin/mount-boot.sh") == 0:
 						internal_kernel_size = str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz"))
 						backup_kernel_size = str(os.path.getsize(self.data_dir + '/.kernels/' + self.currentrunimage() + '.bin'))
 						if internal_kernel_size == backup_kernel_size:
-							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nIt is same, perfect operation", MessageBox.TYPE_INFO)
+							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nBackup kernel of internal : " + size + "\nIt is same, perfect operation", MessageBox.TYPE_INFO)
 						else:
-							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nIt isn't same, maybe you will encounter some issues", MessageBox.TYPE_INFO)
+							self.session.open(MessageBox, "Interal Bootloader Kernel : " + internal_kernel_size + "\nBackup Kernel of Firmware : " + backup_kernel_size + "\nBackup kernel of internal : " + size + "\nIt isn't same, maybe you will encounter some issues", MessageBox.TYPE_INFO)
 						os.system("umount /boot")
 					else:
 						self.session.open(MessageBox,_("Something is wrong") + " !", MessageBox.TYPE_INFO)

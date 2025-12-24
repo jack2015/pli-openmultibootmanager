@@ -496,6 +496,7 @@ class OMBManagerInstall(Screen):
 
 		if nfifile:
 			CMD_LINE = ""
+			size = ""
 			if BOX_MODEL != "dreambox":
 				self.showError(_("Your STB doesn\'t seem supported"))
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
@@ -521,14 +522,21 @@ class OMBManagerInstall(Screen):
 							os.system(OMB_RM_BIN + ' -f ' + target_folder + '/boot/*')
 							os.system(OMB_RM_BIN + ' -f ' + source_file)
 							os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+							if fileExists("/etc/.kernel_size"):
+								with open("/etc/.kernel_size","r") as fp:
+									size = fp.readline().strip()
 							if not fileExists(self.check_kernel_file):
-								if os.system("/usr/bin/mount-boot.sh") == 0:
-									os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
-									os.system("umount /boot")
+								if os.system("/usr/bin/mount-boot.sh") == 0 and size != "":
+									if str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz")) == size :
+										os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+										os.system("umount /boot")
 							else:
-								if os.system("/usr/bin/mount-boot.sh") == 0:
-									if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
+								if os.system("/usr/bin/mount-boot.sh") == 0 and size != "":
+									if (str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz")) == size) and (str(os.path.getsize(self.check_kernel_file)) != size):
+										os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+									elif (str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz")) != size) and (str(os.path.getsize(self.check_kernel_file)) != size):
 										self.showError(_("Install ok but internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."))
+										os.system("umount /boot")
 										return
 									os.system("umount /boot")
 							f = open(datafile_dir + '.timer', "w")
@@ -642,14 +650,21 @@ class OMBManagerInstall(Screen):
 				os.system(OMB_RM_BIN + ' -f ' + target_folder + '/boot/*')
 				os.system(OMB_RM_BIN + ' -f ' + source_file)
 				os.system(OMB_RM_BIN + ' -rf ' + tmp_folder)
+				if fileExists("/etc/.kernel_size"):
+					with open("/etc/.kernel_size","r") as fp:
+						size = fp.readline().strip()
 				if not fileExists(self.check_kernel_file):
-					if os.system("/usr/bin/mount-boot.sh") == 0:
-						os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
-						os.system("umount /boot")
+					if os.system("/usr/bin/mount-boot.sh") == 0 and size != "":
+						if str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz")) == size :
+							os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+							os.system("umount /boot")
 				else:
-					if os.system("/usr/bin/mount-boot.sh") == 0:
-						if os.path.getsize("/boot/vmlinux-3.2-dm800se.gz") != os.path.getsize(self.check_kernel_file):
+					if os.system("/usr/bin/mount-boot.sh") == 0 and size != "":
+						if (str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz")) == size) and (str(os.path.getsize(self.check_kernel_file)) != size):
+							os.system('cp /boot/vmlinux-3.2-dm800se.gz ' + self.check_kernel_file)
+						elif (str(os.path.getsize("/boot/vmlinux-3.2-dm800se.gz")) != size) and (str(os.path.getsize(self.check_kernel_file)) != size):
 							self.showError(_("Install ok but internal flash kernel maybe wrong.\nPlease restore it from kernel.bin."))
+							os.system("umount /boot")
 							return
 						os.system("umount /boot")
 				f = open(datafile_dir + '.timer', "w")
@@ -742,6 +757,7 @@ class OMBManagerInstall(Screen):
 		os.system("sed -i -e '/mmcblk0p3/d' " + dst_path + "/etc/fstab")
 		os.system('rm -rf ' + dst_path + '/tmp/*')
 		os.system("cp -pf /usr/bin/mount-boot.sh " + dst_path + "/usr/bin/mount-boot.sh")
+		os.system("cp -f /etc/.kernel_size " + dst_path + "/etc/.kernel_size")
 
 		fix = False
 		error = False
